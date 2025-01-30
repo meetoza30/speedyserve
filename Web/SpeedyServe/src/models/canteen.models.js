@@ -6,25 +6,37 @@ const canteenSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    listDish: {  
-        type: [String],  // Array of dish names
+    password : {
+        type: String,
         required: true
     },
-    timeSlots: {  
+    mobile: {
         type: Number,
         required: true
     },
+    emailId : {
+        type: String,
+        required:true
+    },
+    listDish: {  
+        type: [{}],  // Array of dish names
+        
+    },
+    timeSlots: {  
+        type: Number,
+        
+    },
     openingTime: {
         type: String,  // Consider using Date or HH:MM format validation
-        required: true
+        
     },
     closingTime: {
         type: String,  // Consider using Date or HH:MM format validation
-        required: true
+        
     },
     maxDish: {
         type: Number,  // Changed to Number since it's a count
-        required: true
+        
     }
 }, { timestamps: true });
 
