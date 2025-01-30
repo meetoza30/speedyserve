@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Canteen } from "../models/canteen.models";
+import { Order } from "../models/order.models";
 
 const registerCanteen = async (req, res)=>{
     try{
@@ -54,6 +55,35 @@ const loginCanteen = async (req, res)=>{
     }
 }
 
+
+const getPendingOrders = async (req,res)=>{
+   try {
+    const {canteenId} = req.params;
+    const canteen = await Canteen.findById(canteenId)
+    const pendingOrders = await Order.find({canteenId, status:"pending"})
+
+    if(!pendingOrders) res.json({message:"No pending orders"});
+
+    res.status(200).json(pendingOrders);
+}
+catch(err){res.error(err)}
+    
+}
+
+const acceptOrder = async(req,res)=>{
+    try{const {canteenId} = req.params;
+    const {orderId} = req.body;
+
+
+    const order = await Order.findOne({_id : orderId, canteenId, status:"pending"})
+    order.status = "preparing";
+    await order.save();
+    res.status(200).json(order);
+}
+catch(err){
+    res.error(err)
+}
+}
 
 
 export {registerCanteen, loginCanteen} ;

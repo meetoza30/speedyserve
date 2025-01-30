@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const orderSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",  // Assuming you have a User model
+        ref: "User",  
         required: true
     },
     canteenId: {
@@ -20,7 +20,8 @@ const orderSchema = new mongoose.Schema({
     ],
     totalPrice: {
         type: Number,
-        required: true
+        required: true,
+        default:0
     },
     status: {
         type: String,

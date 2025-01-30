@@ -7,4 +7,5 @@ const canteenRouter = Router();
 canteenRouter.route('/registerCanteen').post(registerValidation, registerCanteen);
 canteenRouter.route('/loginCanteen').post(loginValidation, loginCanteen);
 
+canteenRouter.route('/getPendingOrders').get()
 export default canteenRouter;

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const connectDB = async()=>{
 
       try{
-        await mongoose.connect("mongodb://localhost:27017/SpeedyServe");
+        await mongoose.connect("mongodb+srv://ozameet300905:FCTXVjjXwfenjsds@speedyserve.k7tt5.mongodb.net/");
         console.log("Database Connection Successfully!!");
       }
       catch(err){
