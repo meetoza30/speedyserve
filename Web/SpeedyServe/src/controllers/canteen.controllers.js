@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { Canteen } from "../models/canteen.models";
-import { Order } from "../models/order.models";
+
+import { Canteen } from "../models/canteen.models.js";
+import { Order } from "../models/order.models.js";
 
 const registerCanteen = async (req, res)=>{
     try{
-        const {name, password, emailId} = req.body;
+        const {name, password, emailId, mobile} = req.body;
 
                 if (!name || !emailId || !password || !mobile) {
                     return res.status(400).json({ message: "All fields are required" });
