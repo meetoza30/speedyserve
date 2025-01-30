@@ -38,12 +38,12 @@ const loginUser = async (req, res) => {
         const { username, password } = req.body;
 
         // Validate inputs
-        if (!usernamee || !password) {
+        if (!username || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
         // Check if user exists
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ username });
         if (!user) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
@@ -55,7 +55,7 @@ const loginUser = async (req, res) => {
         }
 
         // Generate JWT Token
-        const token = jwt.sign({ id: user._id }, "your_secret_key", { expiresIn: "1h" });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
         res.status(200).json({ message: "Login successful", token, userId: user._id });
     } catch (error) {
@@ -64,4 +64,6 @@ const loginUser = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser };
+
+
+export { registerUser, loginUser};
