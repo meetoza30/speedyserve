@@ -35,10 +35,10 @@ const registerUser = async (req, res) => {
 // Login User
 const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { username, password } = req.body;
 
         // Validate inputs
-        if (!email || !password) {
+        if (!usernamee || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
 

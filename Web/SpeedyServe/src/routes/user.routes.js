@@ -10,6 +10,6 @@ const userRouter = Router()
 
 userRouter.route("/register").post(registerValidation,registerUser);
 userRouter.route("/login").post(loginValidation,loginUser);
-router.put("/profile", authenticateUser, updateUserProfile);
+userRouter.put("/profile/update", authenticateUser, updateUserProfile);
 
 export default userRouter;
