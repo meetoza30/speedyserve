@@ -19,7 +19,7 @@ const canteenSchema = new mongoose.Schema({
         required:true
     },
     listDish: {  
-        type: [{}],  // Array of dish names
+        type: [{}],  
         
     },
     timeSlots: {  
@@ -27,15 +27,15 @@ const canteenSchema = new mongoose.Schema({
         
     },
     openingTime: {
-        type: String,  // Consider using Date or HH:MM format validation
+        type: String,  
         
     },
     closingTime: {
-        type: String,  // Consider using Date or HH:MM format validation
+        type: String,  
         
     },
     maxDish: {
-        type: Number,  // Changed to Number since it's a count
+        type: Number,
         
     }
 }, { timestamps: true });
