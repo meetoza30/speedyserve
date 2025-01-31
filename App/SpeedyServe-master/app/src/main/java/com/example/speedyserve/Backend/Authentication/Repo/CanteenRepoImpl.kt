@@ -1,6 +1,7 @@
 package com.example.speedyserve.Backend.Authentication.Repo
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import com.example.speedyserve.Backend.Authentication.Api.AuthApi
 import com.example.speedyserve.Backend.Authentication.Api.DishResponse
 import com.example.speedyserve.Backend.Authentication.Api.orderSchema
@@ -12,16 +13,17 @@ import javax.inject.Inject
 
 
 class CanteenRepoImpl(private val api: AuthApi) : CanteenRepo{
-    private var _orderedDishListRepo = listOf<OrderDish>()
-    var orderDishList = _orderedDishListRepo
+    private var _orderedDishListRepo = mutableStateListOf<OrderDish>()
+    var orderDishList: List<OrderDish> = _orderedDishListRepo
 
-    suspend fun updateList(orderList : List<OrderDish>){
-        _orderedDishListRepo=orderList
-        Log.d("repocheck",orderDishList.toString())
-        Log.d("repocheck1",orderList.toString())
-        Log.d("repocheck2",_orderedDishListRepo.toString())
-        orderDishList=_orderedDishListRepo
+    suspend fun updateList(orderList: List<OrderDish>) {
+        _orderedDishListRepo.clear()
+        _orderedDishListRepo.addAll(orderList)
+        Log.d("repocheck", orderDishList.toString())
+        Log.d("repocheck1", orderList.toString())
+        Log.d("repocheck2", _orderedDishListRepo.toString())
     }
+
     override suspend fun getCanteens(): List<Canteen> {
         return api.getCanteenList()
     }
@@ -36,7 +38,7 @@ class CanteenRepoImpl(private val api: AuthApi) : CanteenRepo{
     }
 
     override suspend fun deleteList() {
-        _orderedDishListRepo=emptyList()
+        _orderedDishListRepo.clear()
     }
 
 }

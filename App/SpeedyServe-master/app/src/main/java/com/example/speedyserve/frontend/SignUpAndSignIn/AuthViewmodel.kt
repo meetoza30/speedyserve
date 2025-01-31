@@ -76,6 +76,7 @@ class AuthViewModel @Inject constructor(private val repo: AuthRepoImp) : ViewMod
                     email = _state.value.email,
                     mobile = _state.value.phoneNumber
                 )
+
             )
             _state.value = _state.value.copy(isLoading = false)
         }

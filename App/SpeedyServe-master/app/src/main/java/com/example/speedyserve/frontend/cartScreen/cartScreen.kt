@@ -54,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -74,6 +75,7 @@ import com.example.speedyserve.frontend.cartScreen.CartViewmodel
 @Preview
 @Composable
 fun CartScreen(modifier: Modifier= Modifier) {
+    val context=LocalContext.current
     val viewmodel: CartViewmodel = hiltViewModel()
     val dishlist = viewmodel.orderdishlist
     Log.d("cartcheck",dishlist.toString())
@@ -96,7 +98,8 @@ fun CartScreen(modifier: Modifier= Modifier) {
             }
             item{
                 Button(
-                    onClick = {viewmodel.onEvent(CartScreenActions.placeOrder)},
+                    onClick = {viewmodel.onEvent(CartScreenActions.placeOrder)
+                              startPayment(context = context,viewmodel.calculate().toInt())},
                     modifier = Modifier.fillMaxWidth().height(50.dp).padding(start = 40.dp, end = 40.dp)
                         .align(Alignment.BottomCenter)
                         .background(
@@ -126,7 +129,7 @@ fun CartScreen(modifier: Modifier= Modifier) {
 }
 @Composable
 fun TimeSlotSelector(viewmodel: CartViewmodel) {
-    val timeSlots = listOf("10:00 AM - 11:00 AM", "11:00 AM - 12:00 PM", "12:00 PM - 1:00 PM", "1:00 PM - 2:00 PM")
+    val timeSlots = listOf("3:00 AM - 4:00 AM", "4:00 AM - 5:00 PM", "5:00 PM - 6:00 PM")
     var selectedSlot by remember { mutableStateOf(timeSlots[0]) }
 
     Box(

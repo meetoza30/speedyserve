@@ -18,6 +18,9 @@ const foodSchema = new mongoose.Schema({
         type:String,
         
     },
+    estimateTime :{
+        type : Number
+    },
     category : {
         type:String,
         // required:true

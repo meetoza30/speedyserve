@@ -50,19 +50,22 @@ dependencies {
 
     // Lifecycle Runtime
 //    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation ("com.razorpay:checkout:1.6.41")
+    implementation(libs.accompanist.pager)
     //Dagger - Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.material.icons.extended)
-    implementation("androidx.compose.material:material-icons-extended:1.7.7")
+    implementation(libs.androidx.compose.material.material.icons.extended)
 
     //Retrofit
     //noinspection UseTomlInstead
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation(libs.converter.gson)
     //noinspection GradleDependency
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
     implementation(libs.adapter.rxjava2) // Optional if using RxJava
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0") // Required for coroutines support

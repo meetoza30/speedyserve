@@ -48,8 +48,8 @@ class CartViewmodel @javax.inject.Inject constructor(private val repoImpl: Cante
                 )
                 viewModelScope.launch {
                     repoImpl.placeOrder(order)
-                    // Clear the list by creating a new instance
-                    orderdishlist = mutableStateListOf()
+                    // Clear the list without reassigning it
+                    orderdishlist.clear()
                     repoImpl.deleteList() // Delete the list in the repository
                 }
             }
