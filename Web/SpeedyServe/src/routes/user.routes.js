@@ -7,8 +7,8 @@ import { loginValidation } from "../middlewares/auth.validation.js";
 
 const userRouter = Router()
 
-userRouter.route("/register").post(registerValidation,registerUser);
-userRouter.route("/login").post(loginValidation,loginUser);
+userRouter.route("/signUp").post(registerUser);
+userRouter.route("/signIn").post(loginUser);
 
 
 export default userRouter;

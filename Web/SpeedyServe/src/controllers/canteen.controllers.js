@@ -43,7 +43,7 @@ const loginCanteen = async (req, res)=>{
                 }
         
                 // Validate password
-                const isPasswordValid = await bcrypt.compare(password, user.password);
+                const isPasswordValid = await bcrypt.compare(password, canteen.password);
                 if (!isPasswordValid) {
                     return res.status(400).json({ message: "Invalid credentials" });
                 }
@@ -56,34 +56,56 @@ const loginCanteen = async (req, res)=>{
 }
 
 
-const getPendingOrders = async (req,res)=>{
+const getCanteens = async (req, res) => {
+    try {
+        const canteens = await Canteen.find({});
+
+        
+        res.status(200).json(canteens);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+
+
+const getCanteensWithDishes  = async (req, res) => {
+    try {
+        const { canteenId } = req.body;
+
+        // Find the canteen by ID and populate the dishes (listDish) array
+        const canteen = await Canteen.findById(canteenId)
+            .populate("listDish", "name description price image category");  // Populate the listDish field with dish details
+
+        if (!canteen) {
+            return res.status(404).json({ success: false, message: "Canteen not found" });
+        }
+
+        // Send the populated dishes array as the response
+        res.status(200).json({
+            success: true,
+            canteen: canteen.name,
+            dishes: canteen.listDish
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+const updateCanteen = async(req, res)=>{
    try {
-    const {canteenId} = req.params;
-    const canteen = await Canteen.findById(canteenId)
-    const pendingOrders = await Order.find({canteenId, status:"pending"})
-
-    if(!pendingOrders) res.json({message:"No pending orders"});
-
-    res.status(200).json(pendingOrders);
-}
-catch(err){res.error(err)}
-    
-}
-
-const acceptOrder = async(req,res)=>{
-    try{const {canteenId} = req.params;
-    const {orderId} = req.body;
-
-
-    const order = await Order.findOne({_id : orderId, canteenId, status:"pending"})
-    order.status = "preparing";
-    await order.save();
-    res.status(200).json(order);
+    const {canteenId, openingTime, closingTime} = req.body;
+    const canteen  = await Canteen.findById(canteenId);
+    canteen.openingTime = openingTime;
+    canteen.closingTime = closingTime
+    await canteen.save();
+    res.json({message : "Update successful"})
 }
 catch(err){
-    res.error(err)
+    res.json({error : err})
 }
 }
-
-
-export {registerCanteen, loginCanteen} ;
+export {registerCanteen, loginCanteen, updateCanteen, getCanteens, getCanteensWithDishes} ;

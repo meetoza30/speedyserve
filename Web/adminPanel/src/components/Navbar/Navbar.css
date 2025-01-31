@@ -1,0 +1,48 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 4%;
+    background-color: #fff;
+    border-bottom: 2px solid #ddd;
+}
+
+.navbar-brand {
+    color: orangered;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.navbar-brand span {
+    font-size: 16px;
+    color: gray;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.signin-btn {
+    padding: 8px 16px;
+    background-color: orangered;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.signin-btn:hover {
+    background-color: darkred;
+}
+
+.profile {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+}

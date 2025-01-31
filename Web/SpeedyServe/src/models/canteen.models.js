@@ -22,10 +22,10 @@ const canteenSchema = new mongoose.Schema({
         type: [{}],  
         
     },
-    timeSlots: {  
-        type: Number,
-        
-    },
+   slots : [{
+    time : String,
+    currentOrders: Number
+   }],
     openingTime: {
         type: String,  
         
@@ -34,9 +34,8 @@ const canteenSchema = new mongoose.Schema({
         type: String,  
         
     },
-    maxDish: {
+    maxDishPerSlot: {
         type: Number,
-        
     }
 }, { timestamps: true });
 

@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 // import jwt from "jsonwebtoken";
 import { User } from "../models/user.models.js"; 
+import { Order } from "../models/order.models.js";
 
 // Register User
 const registerUser = async (req, res) => {
@@ -35,15 +36,15 @@ const registerUser = async (req, res) => {
 // Login User
 const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { username, password } = req.body;
 
         // Validate inputs
-        if (!email || !password) {
+        if (!username || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
         // Check if user exists
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ username });
         if (!user) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
@@ -55,13 +56,28 @@ const loginUser = async (req, res) => {
         }
 
         // Generate JWT Token
-        const token = jwt.sign({ id: user._id }, "your_secret_key", { expiresIn: "1h" });
+        
 
-        res.status(200).json({ message: "Login successful", token, userId: user._id });
+        res.status(200).json({ message: "Login successful", userId: user._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+const getUserOrderDetails = async(req,res)=>{
+   try {
+    const order = await Order.findById(req._id);
+    res.json(order);
+}
+catch(err){
+    res.error(err)
+}
+}
+
+const getPastOrders = async (req,res)=>{
+    const orders = await Order.find({userId : req._id});
+    res.json({pastOrders : orders})
+}
 
 export { registerUser, loginUser };

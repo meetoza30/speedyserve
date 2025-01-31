@@ -6,6 +6,7 @@ import userRouter from "./src/routes/user.routes.js"
 import foodRouter from "./src/routes/food.routes.js";
 import 'dotenv/config'
 import canteenRouter from "./src/routes/canteen.routes.js";
+import orderRouter from "./src/routes/order.routes.js";
 
 const app = express()
 
@@ -21,7 +22,8 @@ connectDB();
 app.use("/api",userRouter);
 app.use("/api/food",foodRouter);
 app.use("/canteens", canteenRouter)
-app.use("/images",express.static('uploads'))
+app.use('/orders', orderRouter)
+// app.use("/images",e)
 
 
 app.listen(process.env.PORT || 5000, () => {

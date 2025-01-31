@@ -1,21 +1,26 @@
-import mongoose from "mongoose";
+
+import mongoose, { Mongoose } from "mongoose";
 
 const orderSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",  
-        required: true
+        // required: true
     },
     canteenId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Canteen",  // Linking the order to a specific canteen
+        type: mongoose.Schema.Types.ObjectId,   
+        ref: "Canteen",  
         required: true
     },
     dishes: [
-        {
-            name: { type: String, required: true }, // Dish name
+        {   foodId : {
+            type : mongoose.Schema.Types.ObjectId
+        },
+            foodName : String, // Dish id
             quantity: { type: Number, required: true, min: 1 }, // Minimum 1 quantity
-            price: { type: Number, required: true } // Price per dish
+            price: { type: Number, required: true } ,
+            estimatedServingTime: { type: Number},
+            isInCart : Boolean
         }
     ],
     totalPrice: {
@@ -31,6 +36,12 @@ const orderSchema = new mongoose.Schema({
     orderTime: {
         type: Date,
         default: Date.now
+    },
+    timeSlot : {
+        type : String
+    },
+    preptime : {
+        type : Date
     }
 }, { timestamps: true });
 

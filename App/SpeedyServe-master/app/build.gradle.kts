@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")
-//    id("com.google.dagger.hilt.android")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -42,33 +42,50 @@ android {
 }
 
 dependencies {
+    // ViewModel
+//    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+
+    // LiveData (if needed)
+//    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+
+    // Lifecycle Runtime
+//    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    //Dagger - Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.material.icons.extended)
+    implementation("androidx.compose.material:material-icons-extended:1.7.7")
+
     //Retrofit
+    //noinspection UseTomlInstead
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
-    implementation("com.squareup.retrofit2:adapter-rxjava2:2.9.0") // Optional if using RxJava
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4") // Required for coroutines support
+    implementation(libs.converter.gson)
+    //noinspection GradleDependency
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation(libs.logging.interceptor)
+    implementation(libs.adapter.rxjava2) // Optional if using RxJava
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0") // Required for coroutines support
 
     // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+//    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
 
     // ViewModel for Jetpack Compose
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 
     // Optional: LiveData support
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
 
     // Optional: SavedState module for ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1")
 
     //navigation
-    implementation("androidx.navigation:navigation-compose:2.7.4")
+    implementation("androidx.navigation:navigation-compose:2.8.6")
     // Hilt Navigation for Jetpack Compose
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     //serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
