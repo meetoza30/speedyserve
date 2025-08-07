@@ -16,7 +16,7 @@ const registerUser = async (req, res) => {
         // Check if user already exists
         const existingUser = await User.findOne({ $or: [{ username }, { email }, { mobile }] });
         if (existingUser) {
-            return res.status(400).json({ message: "Username, Email, or Mobile number already exists" });
+            return res.status(400).json({success : false, message: "Username, Email, or Mobile number already exists" });
         }
 
         // Hash password
@@ -33,7 +33,7 @@ const registerUser = async (req, res) => {
             path: "/", 
             maxAge: 24 * 60 * 60 * 1000, 
         })
-        res.status(201).json({ success : true, message: "You've registered successfully", token : token });
+        res.status(201).json({ success : true, message: "You've registered successfully", data : token });
 
     } catch (error) {
         console.error(error);
@@ -48,19 +48,19 @@ const loginUser = async (req, res) => {
 
         // Validate inputs
         if (!username || !password) {
-            return res.status(400).json({ message: "All fields are required" });
+            return res.status(400).json({success : false,  message: "All fields are required" });
         }
 
         // Check if user exists
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(400).json({success : false, message: "Invalid credentials" });
         }
 
         // Validate password
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(400).json({success : false, message: "Invalid credentials" });
         }
 
         // Generate JWT Token
@@ -72,10 +72,10 @@ const loginUser = async (req, res) => {
             path: "/", 
         })
 
-        res.status(200).json({ success : true,  message: "Login successful", token : token });
+        res.status(200).json({ success : true,  message: "Login successful", data : token });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({success : false, message: "Internal server error" });
     }
 };
 

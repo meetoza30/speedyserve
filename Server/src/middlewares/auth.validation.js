@@ -56,7 +56,7 @@ const authenticateUser =async (req, res, next) => {
         const user = await User.findById(_id);
         if(!user) throw new Error("Something went wrong, please login again");
 
-        res.json({success : true});
+        res.status(200).json({success : true, message : "Token verified!"});
 
     } catch (error) {
         res.status(400).json({success : false, message : error});
