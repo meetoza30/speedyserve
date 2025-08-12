@@ -14,7 +14,7 @@ const registerCanteen = async (req, res)=>{
                 }
                 const existingCanteen = await Canteen.findOne({ $or: [{ name }, { emailId }, { mobile }] });
                 if (existingCanteen) {
-                    return res.status(400).json({ message: "Canteen already exists" });
+                    return res.status(400).json({ message: "Email or phone already exists" });
                 }
 
                 const hashedPassword = await bcrypt.hash(password, 10);
@@ -66,7 +66,7 @@ const loginCanteen = async (req, res)=>{
                             sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
                         })
 
-                res.status(200).json({ message: "Login successful", token});
+                res.status(200).json({success:true, message: "Login successful", token});
     }
     catch(err){
         console.log(err)
@@ -76,10 +76,10 @@ const loginCanteen = async (req, res)=>{
 const getCanteens = async (req, res) => {
     try {
         const canteens = await Canteen.find({});
-        res.status(200).json(canteens);
+        res.status(200).json({success:true, canteens});
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({success: false, message: 'Internal server error' });
     }
 };
 

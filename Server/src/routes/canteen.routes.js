@@ -10,6 +10,6 @@ canteenRouter.route('/getCanteenDishes').get(getCanteensWithDishes)
 canteenRouter.route('/getCanteens').get(getCanteens)
 canteenRouter.route('/updateCanteen').post(updateCanteen)
 canteenRouter.route('/removeDish').post(removeDish)
-canteenRouter.route('/addFood').post(upload.single('image'), addDish);
+canteenRouter.route('/addDish').post(upload.single('image'), addDish);
 // canteenRouter.route('/getPendingOrders').get()
 export default canteenRouter;
