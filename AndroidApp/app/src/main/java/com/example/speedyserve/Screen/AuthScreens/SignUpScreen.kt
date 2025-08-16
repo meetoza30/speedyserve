@@ -54,8 +54,8 @@ fun SignUpScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        MaterialTheme.colorScheme.secondary,
-                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
+                        Color(0xFF1A1B2E),
+                        Color(0xFF1A1B2E).copy(alpha = 0.8f)
                     )
                 )
             )

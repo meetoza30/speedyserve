@@ -43,76 +43,6 @@ import com.example.speedyserve.ViewModels.AuthVM.AuthVM
 import kotlin.math.cos
 import kotlin.math.sin
 
-// Custom Colors
-private val DarkBlue = Color(0xFF1A1B2E)
-private val Orange = Color(0xFFFF6B35)
-private val LightGray = Color(0xFFF5F5F5)
-private val DarkGray = Color(0xFF666666)
-private val White = Color(0xFFFFFFFF)
-private val Black = Color(0xFF000000)
-private val FacebookBlue = Color(0xFF3B5998)
-private val TwitterBlue = Color(0xFF1DA1F2)
-
-// Light Theme Colors
-private val LightColorScheme = lightColorScheme(
-    primary = Orange,
-    onPrimary = White,
-    secondary = DarkBlue,
-    onSecondary = White,
-    background = White,
-    onBackground = Black,
-    surface = LightGray,
-    onSurface = Black,
-    surfaceVariant = LightGray,
-    onSurfaceVariant = DarkGray
-)
-
-// Dark Theme Colors
-private val DarkColorScheme = darkColorScheme(
-    primary = Orange,
-    onPrimary = White,
-    secondary = DarkBlue,
-    onSecondary = White,
-    background = DarkBlue,
-    onBackground = White,
-    surface = Color(0xFF2A2B3E),
-    onSurface = White,
-    surfaceVariant = Color(0xFF2A2B3E),
-    onSurfaceVariant = Color(0xFFCCCCCC)
-)
-
-// Custom Typography
-private val AppTypography = Typography(
-    headlineLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Bold,
-        fontSize = 24.sp,
-        lineHeight = 32.sp,
-        letterSpacing = 0.sp
-    ),
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.25.sp
-    ),
-    labelLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp
-    )
-)
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,8 +59,8 @@ fun LoginScreen(AuthVM : AuthVM,
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        MaterialTheme.colorScheme.secondary,
-                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
+                        Color(0xFF1A1B2E),
+                        Color(0xFF1A1B2E).copy(alpha = 0.8f)
                     )
                 )
             )

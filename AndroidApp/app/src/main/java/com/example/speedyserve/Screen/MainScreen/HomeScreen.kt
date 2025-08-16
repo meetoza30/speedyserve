@@ -1,10 +1,11 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.speedyserve.Screen
+package com.example.speedyserve.Screen.MainScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -31,81 +32,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.speedyserve.ui.theme.SpeedyServeTheme
 
-// Custom Color Scheme
-private val FoodDeliveryLightColors = lightColorScheme(
-    primary = Color(0xFFFF6B35), // Vibrant Orange
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFE8E0), // Light Orange
-    onPrimaryContainer = Color(0xFF8B2500), // Dark Orange
-
-    secondary = Color(0xFFFFA726), // Amber
-    onSecondary = Color.Black,
-    secondaryContainer = Color(0xFFFFF3C4), // Light Amber
-    onSecondaryContainer = Color(0xFF663C00), // Dark Amber
-
-    tertiary = Color(0xFF4CAF50), // Green for success states
-    onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFE8F5E8),
-    onTertiaryContainer = Color(0xFF1B5E20),
-
-    error = Color(0xFFE53935),
-    onError = Color.White,
-    errorContainer = Color(0xFFFFEBEE),
-    onErrorContainer = Color(0xFFB71C1C),
-
-    background = Color(0xFFFFFBFF), // Slightly warm white
-    onBackground = Color(0xFF1F1B16), // Dark brown
-
-    surface = Color.White,
-    onSurface = Color(0xFF1F1B16),
-    surfaceVariant = Color(0xFFF5F1EB), // Warm light gray
-    onSurfaceVariant = Color(0xFF524639), // Warm dark gray
-
-    outline = Color(0xFF857468), // Warm gray outline
-    outlineVariant = Color(0xFFD7C2B8), // Light warm outline
-
-    inverseSurface = Color(0xFF352F2A), // Dark warm surface
-    inverseOnSurface = Color(0xFFF9EFE6), // Light warm text
-    inversePrimary = Color(0xFFFFB599), // Light orange for dark theme
-)
-
-private val FoodDeliveryDarkColors = darkColorScheme(
-    primary = Color(0xFFFFB599), // Light Orange for dark
-    onPrimary = Color(0xFF552100), // Dark Orange
-    primaryContainer = Color(0xFF7A3200), // Medium Orange
-    onPrimaryContainer = Color(0xFFFFE8E0),
-
-    secondary = Color(0xFFFFD54F), // Light Amber for dark
-    onSecondary = Color(0xFF3D2F00), // Dark Amber
-    secondaryContainer = Color(0xFF5A4600),
-    onSecondaryContainer = Color(0xFFFFF3C4),
-
-    tertiary = Color(0xFF81C784), // Light Green
-    onTertiary = Color(0xFF003D06),
-    tertiaryContainer = Color(0xFF1B5E20),
-    onTertiaryContainer = Color(0xFFE8F5E8),
-
-    error = Color(0xFFEF5350),
-    onError = Color(0xFF690005),
-    errorContainer = Color(0xFF93000A),
-    onErrorContainer = Color(0xFFFFEBEE),
-
-    background = Color(0xFF1F1B16), // Dark warm background
-    onBackground = Color(0xFFF9EFE6), // Light warm text
-
-    surface = Color(0xFF1F1B16),
-    onSurface = Color(0xFFF9EFE6),
-    surfaceVariant = Color(0xFF524639), // Dark warm gray
-    onSurfaceVariant = Color(0xFFD7C2B8), // Light warm gray
-
-    outline = Color(0xFF9F8D80), // Medium warm gray
-    outlineVariant = Color(0xFF524639),
-
-    inverseSurface = Color(0xFFF9EFE6),
-    inverseOnSurface = Color(0xFF352F2A),
-    inversePrimary = Color(0xFFFF6B35),
-)
 
 data class Category(
     val name: String,
@@ -124,13 +52,15 @@ data class Restaurant(
 
 @Preview(showSystemUi = true)
 @Composable
-fun FoodDeliveryApp() {
-    val isSystemInDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
-    val colorScheme = if (isSystemInDarkTheme) {
-        FoodDeliveryDarkColors
-    } else {
-        FoodDeliveryLightColors
+private fun pre() {
+    SpeedyServeTheme {
+        FoodDeliveryApp()
     }
+}
+
+
+@Composable
+fun FoodDeliveryApp() {
 
     val categories = listOf(
         Category("All", Icons.Default.LocalFireDepartment, true),
@@ -156,7 +86,6 @@ fun FoodDeliveryApp() {
         )
     )
 
-    MaterialTheme(colorScheme = colorScheme) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -197,7 +126,8 @@ fun FoodDeliveryApp() {
                     IconButton(onClick = { },
                         modifier = Modifier.padding(start = 10.dp)) {
                         Box(
-                            modifier = Modifier.clip(CircleShape)
+                            modifier = Modifier
+                                .clip(CircleShape)
                                 .size(50.dp)
                                 .background(color = Color(0xFFECF0F4))
 //                                .shadow(elevation = 2.dp, shape = CircleShape)
@@ -205,7 +135,8 @@ fun FoodDeliveryApp() {
                             Icon(
                                 imageVector = Icons.Default.Menu,
                                 contentDescription = "Menu",
-                                modifier = Modifier.align(Alignment.Center)
+                                modifier = Modifier
+                                    .align(Alignment.Center)
                                     .padding(5.dp)
                             )
                         }
@@ -214,7 +145,8 @@ fun FoodDeliveryApp() {
                 },
                 actions = {
                     Box(
-                        modifier = Modifier.padding(end = 10.dp)
+                        modifier = Modifier
+                            .padding(end = 10.dp)
                             .size(40.dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary),
@@ -352,7 +284,7 @@ fun FoodDeliveryApp() {
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
-    }
+
 }
 
 @Composable

@@ -1,5 +1,6 @@
 package com.example.speedyserve.Navigation
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,11 +20,13 @@ fun NavigationApp(navController : NavHostController,
 
         //authScreens
          composable(route = Screen.SIGNIN.name) {
-             LoginScreen(AuthVM,navController)
+
+                 LoginScreen(AuthVM,navController)
+
          }
 
         composable(route = Screen.SIGNUP.name) {
-            SignUpScreen(AuthVM)
+                SignUpScreen(AuthVM)
         }
 
 
