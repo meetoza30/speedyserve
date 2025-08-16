@@ -26,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.speedyserve.ViewModels.AuthVM.AuthVM
@@ -280,7 +279,8 @@ fun SignUpScreen(
                         // Handle sign up logic
                         // You can add password validation here
                         if (password == retypePassword && password.isNotEmpty()) {
-                            authVM.signUp(name = name,
+                            authVM.signUp(context = context,
+                                name = name,
                                 email = email,
                                 password = password,
                                 mobile = mobile){

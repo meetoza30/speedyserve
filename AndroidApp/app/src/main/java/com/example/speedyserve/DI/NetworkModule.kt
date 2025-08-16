@@ -1,6 +1,6 @@
 package com.example.speedyserve.DI
 
-import com.example.speedyserve.API.AuthApi
+import com.example.speedyserve.API.Apis
 import com.example.speedyserve.Repo.Repo
 import dagger.Module
 import dagger.Provides
@@ -17,7 +17,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthapi (): AuthApi {
+    fun provideAuthapi (): Apis {
         return Retrofit.Builder()
             .baseUrl("https://speedyserve-server.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -27,8 +27,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepo(authApi : AuthApi) : Repo {
-        return Repo(authApi)
+    fun provideAuthRepo(apis : Apis) : Repo {
+        return Repo(apis)
     }
 
 

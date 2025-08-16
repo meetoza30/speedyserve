@@ -2,12 +2,9 @@ package com.example.speedyserve.Screen.AuthScreens
 
 // Theme.kt
 import android.widget.Toast
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
@@ -33,11 +30,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.speedyserve.Navigation.Screen
 import com.example.speedyserve.ViewModels.AuthVM.AuthVM
 import kotlin.math.cos
@@ -214,7 +208,8 @@ fun LoginScreen(AuthVM : AuthVM,
                 // Login button
                 Button(
                     onClick = {
-                        AuthVM.signIn(name = name,
+                        AuthVM.signIn(context = context,
+                            name = name,
                             password = password){
                             Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
                         }

@@ -2,6 +2,7 @@
 
 package com.example.speedyserve.Screen.MainScreen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,13 +27,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.speedyserve.VM.CanteenVM.HomeScreenVM
 import com.example.speedyserve.ui.theme.SpeedyServeTheme
+import kotlin.math.log
 
 
 data class Category(
@@ -50,17 +54,27 @@ data class Restaurant(
     val imageRes: Int? = null
 )
 
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
+//@Composable
+//private fun pre() {
+//    SpeedyServeTheme {
+//        FoodDeliveryApp()
+//    }
+//}
+
+
 @Composable
-private fun pre() {
-    SpeedyServeTheme {
-        FoodDeliveryApp()
+fun HomeScreen(HomeScreenVM : HomeScreenVM) {
+    val canteenList by HomeScreenVM.canteenList.collectAsState()
+    val isLoading by HomeScreenVM.isLoading.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit){
+        HomeScreenVM.fetchCanteens(){
+            Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
+        }
+
     }
-}
-
-
-@Composable
-fun FoodDeliveryApp() {
 
     val categories = listOf(
         Category("All", Icons.Default.LocalFireDepartment, true),
