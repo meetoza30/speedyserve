@@ -10,7 +10,7 @@ const registerUser = async (req, res) => {
 
         // Check for missing fields
         if (!username || !email || !password || !mobile) {
-            return res.status(400).json({ message: "All fields are required" });
+            return res.status(400).json({success : false , message: "All fields are required" });
         }
 
         // Check if user already exists
@@ -37,7 +37,7 @@ const registerUser = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({success : false, message: "Internal server error" });
     }
 };
 
