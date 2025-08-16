@@ -5,6 +5,8 @@ import com.example.speedyserve.Models.AuthModels.UserSignInReq
 import com.example.speedyserve.Models.AuthModels.UserSignUpReq
 import com.example.speedyserve.Models.Canteens.Canteen
 import com.example.speedyserve.Models.Canteens.CanteenResponse
+import com.example.speedyserve.Models.Dishes.DishesReq
+import com.example.speedyserve.Models.Dishes.DishesResponse
 import com.example.speedyserve.Models.Token.Token
 import retrofit2.Response
 import retrofit2.http.Body
@@ -24,7 +26,9 @@ interface Apis {
     suspend fun ReAuth(@Body token: Token) : Response<Token>
 
     //canteenApis
-
     @GET("api/getCanteens")
     suspend fun getCanteens() : Response<CanteenResponse>
+
+    @POST("api/getCanteenDishes")
+    suspend fun getCanteenDishes(@Body canteenId : DishesReq) : Response<DishesResponse>
 }

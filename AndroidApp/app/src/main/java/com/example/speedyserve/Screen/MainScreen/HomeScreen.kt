@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.speedyserve.Models.Canteens.Canteen
 import com.example.speedyserve.VM.CanteenVM.HomeScreenVM
 import com.example.speedyserve.ui.theme.SpeedyServeTheme
 import kotlin.math.log
@@ -64,7 +65,7 @@ data class Restaurant(
 
 
 @Composable
-fun HomeScreen(HomeScreenVM : HomeScreenVM) {
+fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
     val canteenList by HomeScreenVM.canteenList.collectAsState()
     val isLoading by HomeScreenVM.isLoading.collectAsState()
     val context = LocalContext.current
@@ -293,10 +294,15 @@ fun HomeScreen(HomeScreenVM : HomeScreenVM) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            restaurants.forEach { restaurant ->
-                RestaurantCard(restaurant = restaurant)
-                Spacer(modifier = Modifier.height(16.dp))
+            if(isLoading){
+                CircularProgressIndicator(modifier = Modifier.padding(50.dp))
+            }else{
+                canteenList.forEach { restaurant ->
+                    RestaurantCard(restaurant = restaurant, onCanteenClick = onCanteenClick)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
+
         }
 
 }
@@ -345,11 +351,13 @@ fun CategoryChip(category: Category,
 }
 
 @Composable
-fun RestaurantCard(restaurant: Restaurant) {
+fun RestaurantCard(restaurant: Canteen,
+                   onCanteenClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .clickable(enabled = true, onClick = { onCanteenClick(restaurant._id) }),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -382,14 +390,14 @@ fun RestaurantCard(restaurant: Restaurant) {
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = restaurant.cuisine,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+//                Spacer(modifier = Modifier.height(4.dp))
+//                Text(
+//                    text = restaurant.cuisine,
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                    maxLines = 1,
+//                    overflow = TextOverflow.Ellipsis
+//                )
 
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
@@ -398,63 +406,23 @@ fun RestaurantCard(restaurant: Restaurant) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Rating
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Rating",
-                            tint = Color(0xFFFF9800),
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = restaurant.rating.toString(),
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+//                    Row(
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Star,
+//                            contentDescription = "Rating",
+//                            tint = Color(0xFFFF9800),
+//                            modifier = Modifier.size(16.dp)
+//                        )
+//                        Text(
+//                            text = restaurant.rating.toString(),
+//                            style = MaterialTheme.typography.bodySmall,
+//                            fontWeight = FontWeight.Medium
+//                        )
+//                    }
 
-                    // Delivery Fee
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DeliveryDining,
-                            contentDescription = "Delivery",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = restaurant.deliveryFee,
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.Medium,
-                            color = if (restaurant.deliveryFee == "Free") {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            }
-                        )
-                    }
-
-                    // Delivery Time
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AccessTime,
-                            contentDescription = "Time",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = restaurant.deliveryTime,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
                 }
             }
         }

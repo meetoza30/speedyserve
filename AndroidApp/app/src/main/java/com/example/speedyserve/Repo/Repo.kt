@@ -6,6 +6,8 @@ import com.example.speedyserve.Models.AuthModels.UserSignInReq
 import com.example.speedyserve.Models.AuthModels.UserSignUpReq
 import com.example.speedyserve.Models.Canteens.Canteen
 import com.example.speedyserve.Models.Canteens.CanteenResponse
+import com.example.speedyserve.Models.Dishes.DishesReq
+import com.example.speedyserve.Models.Dishes.DishesResponse
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -75,5 +77,27 @@ class Repo @Inject constructor(private val apis: Apis)  {
             Result.failure(e)
         }
 
+    }
+
+    suspend fun getCanteenDishes(dishesReq: DishesReq) : Result<DishesResponse>{
+        return try {
+            val response = apis.getCanteenDishes(dishesReq)
+            if(response.isSuccessful){
+                response.body()?.let {
+                    Result.success(it)
+                }?: Result.failure(Exception("Empty Response Body"))
+            }else{
+                val errorBody = response.errorBody()?.toString()
+                val errorMessage = try{
+                    val jsonObject = JSONObject(errorBody)
+                    jsonObject.getString("message")
+                }catch (e : Exception){
+                    "Unknown Error }"
+                }
+                Result.failure(Exception("Fetching Dishes failed : $errorMessage"))
+            }
+        }catch (e : Exception){
+            Result.failure(e)
+        }
     }
 }

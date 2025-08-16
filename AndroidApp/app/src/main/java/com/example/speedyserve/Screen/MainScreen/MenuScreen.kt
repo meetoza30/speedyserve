@@ -2,8 +2,8 @@
 
 package com.speedyserve.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,10 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.Money
@@ -27,88 +25,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.speedyserve.VM.CanteenVM.MenuScreenVM
+import com.example.speedyserve.ui.theme.SpeedyServeTheme
 
-// Custom Color Scheme
-private val FoodDeliveryLightColors = lightColorScheme(
-    primary = Color(0xFFFF6B35), // Vibrant Orange
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFE8E0), // Light Orange
-    onPrimaryContainer = Color(0xFF8B2500), // Dark Orange
-
-    secondary = Color(0xFFFFA726), // Amber
-    onSecondary = Color.Black,
-    secondaryContainer = Color(0xFFFFF3C4), // Light Amber
-    onSecondaryContainer = Color(0xFF663C00), // Dark Amber
-
-    tertiary = Color(0xFF4CAF50), // Green for success states
-    onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFE8F5E8),
-    onTertiaryContainer = Color(0xFF1B5E20),
-
-    error = Color(0xFFE53935),
-    onError = Color.White,
-    errorContainer = Color(0xFFFFEBEE),
-    onErrorContainer = Color(0xFFB71C1C),
-
-    background = Color(0xFFFFFBFF), // Slightly warm white
-    onBackground = Color(0xFF1F1B16), // Dark brown
-
-    surface = Color.White,
-    onSurface = Color(0xFF1F1B16),
-    surfaceVariant = Color(0xFFF5F1EB), // Warm light gray
-    onSurfaceVariant = Color(0xFF524639), // Warm dark gray
-
-    outline = Color(0xFF857468), // Warm gray outline
-    outlineVariant = Color(0xFFD7C2B8), // Light warm outline
-
-    inverseSurface = Color(0xFF352F2A), // Dark warm surface
-    inverseOnSurface = Color(0xFFF9EFE6), // Light warm text
-    inversePrimary = Color(0xFFFFB599), // Light orange for dark theme
-)
-
-private val FoodDeliveryDarkColors = darkColorScheme(
-    primary = Color(0xFFFFB599), // Light Orange for dark
-    onPrimary = Color(0xFF552100), // Dark Orange
-    primaryContainer = Color(0xFF7A3200), // Medium Orange
-    onPrimaryContainer = Color(0xFFFFE8E0),
-
-    secondary = Color(0xFFFFD54F), // Light Amber for dark
-    onSecondary = Color(0xFF3D2F00), // Dark Amber
-    secondaryContainer = Color(0xFF5A4600),
-    onSecondaryContainer = Color(0xFFFFF3C4),
-
-    tertiary = Color(0xFF81C784), // Light Green
-    onTertiary = Color(0xFF003D06),
-    tertiaryContainer = Color(0xFF1B5E20),
-    onTertiaryContainer = Color(0xFFE8F5E8),
-
-    error = Color(0xFFEF5350),
-    onError = Color(0xFF690005),
-    errorContainer = Color(0xFF93000A),
-    onErrorContainer = Color(0xFFFFEBEE),
-
-    background = Color(0xFF1F1B16), // Dark warm background
-    onBackground = Color(0xFFF9EFE6), // Light warm text
-
-    surface = Color(0xFF1F1B16),
-    onSurface = Color(0xFFF9EFE6),
-    surfaceVariant = Color(0xFF524639), // Dark warm gray
-    onSurfaceVariant = Color(0xFFD7C2B8), // Light warm gray
-
-    outline = Color(0xFF9F8D80), // Medium warm gray
-    outlineVariant = Color(0xFF524639),
-
-    inverseSurface = Color(0xFFF9EFE6),
-    inverseOnSurface = Color(0xFF352F2A),
-    inversePrimary = Color(0xFFFF6B35),
-)
 
 data class FoodItem(
     val id: String,
@@ -125,11 +50,21 @@ data class Category(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RestaurantScreen(
+fun MenuScreen(
+    canteenId : String,
+    viewmodel : MenuScreenVM,
     onBackClick: () -> Unit = {},
     onItemClick: (FoodItem) -> Unit = {},
     onAddToCart: (FoodItem) -> Unit = {}
 ) {
+    val dishes by viewmodel.menu.collectAsState()
+    val isLoading by viewmodel.isLoading.collectAsState()
+    val context  = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewmodel.fetchDishes (canteenId = canteenId){
+            Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
+        }
+    }
     var selectedCategory by remember { mutableStateOf("Burger") }
 
     val categories = listOf("Burger", "Sandwich", "Pizza", "Sandwich")
@@ -503,31 +438,20 @@ fun FoodItemCard(
     }
 }
 
-@Composable
-fun SpeedyServeTheme(
-    darkTheme: Boolean = false,
-    content: @Composable () -> Unit
-) {
-    val colors = if (darkTheme) FoodDeliveryDarkColors else FoodDeliveryLightColors
 
-    MaterialTheme(
-        colorScheme = colors,
-        content = content
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun RestaurantScreenPreview() {
-    SpeedyServeTheme {
-        RestaurantScreen()
-    }
-}
-
-@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun RestaurantScreenDarkPreview() {
-    SpeedyServeTheme(darkTheme = true) {
-        RestaurantScreen()
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun RestaurantScreenPreview() {
+//    SpeedyServeTheme {
+//        RestaurantScreen()
+//    }
+//}
+//
+//@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+//@Composable
+//fun RestaurantScreenDarkPreview() {
+//    SpeedyServeTheme(darkTheme = true) {
+//        RestaurantScreen()
+//    }
+//}

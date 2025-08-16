@@ -6,7 +6,9 @@ data class Canteen(
     val mobile : String = "",
     val emailId : String = "",
     val slots : List<String> = emptyList(),
-)
+    val openingTime : String = "",
+    val closingTime : String = ""
+    )
 
 data class CanteenResponse (
     val success : Boolean,
