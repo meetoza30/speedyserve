@@ -6,7 +6,7 @@ const canteenRouter = Router();
 
 canteenRouter.route('/registerCanteen').post(registerCanteen);
 canteenRouter.route('/loginCanteen').post(loginCanteen);
-canteenRouter.route('/getCanteenDishes').get(getCanteensWithDishes)
+canteenRouter.route('/getCanteenDishes').post(getCanteensWithDishes)
 canteenRouter.route('/getCanteens').get(getCanteens)
 canteenRouter.route('/updateCanteen').post(updateCanteen)
 canteenRouter.route('/removeDish').post(removeDish)
