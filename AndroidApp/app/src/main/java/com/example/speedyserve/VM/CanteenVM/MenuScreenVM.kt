@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.speedyserve.Models.Canteens.Canteen
 import com.example.speedyserve.Models.Dishes.Dish
 import com.example.speedyserve.Models.Dishes.DishesReq
 import com.example.speedyserve.Repo.Repo
@@ -18,6 +19,9 @@ class MenuScreenVM @Inject constructor(private val repo: Repo) : ViewModel() {
     private val _menu : MutableStateFlow<List<Dish>> = MutableStateFlow(emptyList())
     val menu : StateFlow<List<Dish>> = _menu
 
+    private val _canteen : MutableStateFlow<Canteen> = MutableStateFlow(Canteen())
+    val canteen : StateFlow<Canteen> = _canteen
+
     val isLoading : MutableStateFlow<Boolean> = MutableStateFlow(true)
 
 
@@ -30,6 +34,7 @@ class MenuScreenVM @Inject constructor(private val repo: Repo) : ViewModel() {
                 .onSuccess {
                     result ->
                     _menu.value = result.dishes
+                    _canteen.value = result.canteen
                     Log.d("dishes",result.dishes.toString())
                     isLoading.value=false
                 }

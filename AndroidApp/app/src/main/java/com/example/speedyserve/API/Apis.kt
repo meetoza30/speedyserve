@@ -1,6 +1,8 @@
 package com.example.speedyserve.API
 
 import com.example.speedyserve.Models.ApiResponse.ApiResponse
+import com.example.speedyserve.Models.ApiResponse.CheckAuthResponse
+import com.example.speedyserve.Models.ApiResponse.TokenReq
 import com.example.speedyserve.Models.AuthModels.UserSignInReq
 import com.example.speedyserve.Models.AuthModels.UserSignUpReq
 import com.example.speedyserve.Models.Canteens.Canteen
@@ -22,8 +24,8 @@ interface Apis {
     @POST("api/login")
     suspend fun signIn(@Body user: UserSignInReq) : Response<ApiResponse>
 
-    @POST("api/reauth")
-    suspend fun ReAuth(@Body token: Token) : Response<Token>
+    @POST("api/check-auth")
+    suspend fun checkAuth(@Body token: TokenReq) : Response<CheckAuthResponse>
 
     //canteenApis
     @GET("api/getCanteens")

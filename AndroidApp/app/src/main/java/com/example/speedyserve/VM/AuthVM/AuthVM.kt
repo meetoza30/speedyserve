@@ -16,7 +16,13 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthVM @Inject constructor(private val repo: Repo) : ViewModel() {
 
-    fun signUp(context: Context,name: String, email: String, password: String,mobile : String,onResult : (String)-> Unit) {
+    fun signUp(context: Context,
+               name: String,
+               email: String,
+               password: String,
+               mobile : String,
+               onSuccess : (String)-> Unit,
+               onFailure: (String) -> Unit) {
         val user = UserSignUpReq(
             username = name,
             email = email,
@@ -30,17 +36,17 @@ class AuthVM @Inject constructor(private val repo: Repo) : ViewModel() {
                     Log.d("loging",result.data.toString())
                     val tokenManager = TokenManager(context)
                     tokenManager.saveToken(result.data)
-                    onResult(result.message)
+                    onSuccess(result.message)
                 }
                 .onFailure {
                     result->
-                    onResult(result.message?:"Unknown Error")
+                    onFailure(result.message?:"Unknown Error")
                 }
         }
 
     }
 
-    fun signIn(context : Context ,name: String, password: String,onResult : (String)-> Unit) {
+    fun signIn(context : Context ,name: String, password: String,onSuccess: (String)-> Unit , onFailure : (String)-> Unit) {
         val user = UserSignInReq(
             username = name,
             password = password
@@ -52,12 +58,12 @@ class AuthVM @Inject constructor(private val repo: Repo) : ViewModel() {
                     Log.d("loging",result.data)
                     val tokenManager = TokenManager(context)
                     tokenManager.saveToken(result.data)
-                    onResult(result.message)
+                    onSuccess(result.message)
                 }
                 .onFailure {
                         result->
                     Log.d("loging",result.message.toString())
-                    onResult(result.message?:"Unknown Error")
+                    onFailure(result.message?:"Unknown Error")
                 }
         }
 

@@ -31,22 +31,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.speedyserve.Models.Dishes.Dish
 import com.example.speedyserve.VM.CanteenVM.MenuScreenVM
 import com.example.speedyserve.ui.theme.SpeedyServeTheme
 
 
-data class FoodItem(
-    val id: String,
-    val name: String,
-    val description: String,
-    val price: String,
-    val imageRes: Int? = null // In real app, use URL
-)
-
-data class Category(
-    val name: String,
-    val isSelected: Boolean = false
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,9 +43,10 @@ fun MenuScreen(
     canteenId : String,
     viewmodel : MenuScreenVM,
     onBackClick: () -> Unit = {},
-    onItemClick: (FoodItem) -> Unit = {},
-    onAddToCart: (FoodItem) -> Unit = {}
+    onItemClick: (Dish) -> Unit = {},
+    onAddToCart: (Dish) -> Unit = {}
 ) {
+    val canteen by viewmodel.canteen.collectAsState()
     val dishes by viewmodel.menu.collectAsState()
     val isLoading by viewmodel.isLoading.collectAsState()
     val context  = LocalContext.current
@@ -69,20 +59,20 @@ fun MenuScreen(
 
     val categories = listOf("Burger", "Sandwich", "Pizza", "Sandwich")
 
-    val burgerItems = listOf(
-        FoodItem(
-            id = "1",
-            name = "Burger Ferguson",
-            description = "Spicy Restaurant",
-            price = "$40"
-        ),
-        FoodItem(
-            id = "2",
-            name = "Rockin' Burgers",
-            description = "Cafeschoolcup",
-            price = "$40"
-        )
-    )
+//    val burgerItems = listOf(
+//        FoodItem(
+//            id = "1",
+//            name = "Burger Ferguson",
+//            description = "Spicy Restaurant",
+//            price = "$40"
+//        ),
+//        FoodItem(
+//            id = "2",
+//            name = "Rockin' Burgers",
+//            description = "Cafeschoolcup",
+//            price = "$40"
+//        )
+//    )
 
     Column(
         modifier = Modifier
@@ -93,7 +83,7 @@ fun MenuScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "Restaurant View",
+                    text = canteen.name,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(10.dp)
@@ -178,7 +168,7 @@ fun MenuScreen(
                         .padding(horizontal = 20.dp)
                 ) {
                     Text(
-                        text = "Spicy Restaurant",
+                        text = canteen.name,
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold
                         ),
@@ -219,24 +209,6 @@ fun MenuScreen(
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     fontWeight = FontWeight.Medium
                                 ),
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-
-                        // Free delivery
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Money,
-                                contentDescription = "Free",
-                                tint = MaterialTheme.colorScheme.tertiary,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Text(
-                                text = "Free",
-                                style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                         }
@@ -303,7 +275,7 @@ fun MenuScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "$selectedCategory (${burgerItems.size})",
+                        text = "$selectedCategory (${dishes.size})",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.SemiBold
                         ),
@@ -313,7 +285,7 @@ fun MenuScreen(
             }
 
             // Food Items Grid (2 columns)
-            items(burgerItems.chunked(2)) { rowItems ->
+            items(dishes.chunked(2)) { rowItems ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -346,7 +318,7 @@ fun MenuScreen(
 
 @Composable
 fun FoodItemCard(
-    item: FoodItem,
+    item: Dish,
     onClick: () -> Unit,
     onAddToCart: () -> Unit,
     modifier: Modifier = Modifier

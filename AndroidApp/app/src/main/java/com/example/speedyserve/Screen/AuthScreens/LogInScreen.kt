@@ -210,9 +210,18 @@ fun LoginScreen(AuthVM : AuthVM,
                     onClick = {
                         AuthVM.signIn(context = context,
                             name = name,
-                            password = password){
-                            Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
-                        }
+                            password = password,
+                            onSuccess = {
+                                Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
+                                navController.navigate(Screen.HOMESCREEN.name){
+                                    popUpTo(0){inclusive = true}
+                                    launchSingleTop =true
+
+                                }
+                            },
+                            onFailure = {
+                                Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
+                            })
                     },
                     modifier = Modifier
                         .fillMaxWidth()

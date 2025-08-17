@@ -9,7 +9,7 @@ const userRouter = Router()
 
 userRouter.route("/signup").post(registerUser);
 userRouter.route("/login").post(loginUser);
-userRouter.route("/check-auth").get(authenticateUser);
+userRouter.route("/check-auth").post(authenticateUser);
 
 
 export default userRouter;

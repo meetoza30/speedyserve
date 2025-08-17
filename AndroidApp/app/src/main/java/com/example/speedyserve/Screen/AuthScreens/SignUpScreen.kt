@@ -28,6 +28,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.speedyserve.Navigation.Screen
 import com.example.speedyserve.ViewModels.AuthVM.AuthVM
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +37,7 @@ import com.example.speedyserve.ViewModels.AuthVM.AuthVM
 fun SignUpScreen(
     authVM: AuthVM,
     onBackClick: () -> Unit = {},
+    navController: NavController,
     modifier: Modifier= Modifier
 ) {
     var name by remember { mutableStateOf("") }
@@ -283,11 +286,19 @@ fun SignUpScreen(
                                 name = name,
                                 email = email,
                                 password = password,
-                                mobile = mobile){
+                                mobile = mobile,
+                                onSuccess = {
+                                    Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
+                                    navController.navigate(Screen.HOMESCREEN.name){
+                                        popUpTo(0){inclusive=true}
+                                        launchSingleTop=true
+                                    }
+                                }){
                                 Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
                             }
                         } else {
                             // Show error message
+                            Toast.makeText(context,"password is empty or password does not match ", Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier

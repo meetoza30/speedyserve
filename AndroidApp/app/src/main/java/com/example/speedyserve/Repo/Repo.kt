@@ -2,6 +2,8 @@ package com.example.speedyserve.Repo
 
 import com.example.speedyserve.API.Apis
 import com.example.speedyserve.Models.ApiResponse.ApiResponse
+import com.example.speedyserve.Models.ApiResponse.CheckAuthResponse
+import com.example.speedyserve.Models.ApiResponse.TokenReq
 import com.example.speedyserve.Models.AuthModels.UserSignInReq
 import com.example.speedyserve.Models.AuthModels.UserSignUpReq
 import com.example.speedyserve.Models.Canteens.Canteen
@@ -95,6 +97,22 @@ class Repo @Inject constructor(private val apis: Apis)  {
                     "Unknown Error }"
                 }
                 Result.failure(Exception("Fetching Dishes failed : $errorMessage"))
+            }
+        }catch (e : Exception){
+            Result.failure(e)
+        }
+    }
+
+    suspend fun checkAuthentication(token: String) : Result<CheckAuthResponse>{
+        return try {
+            val tokenReq = TokenReq(token)
+            val response = apis.checkAuth(tokenReq)
+            if(response.isSuccessful){
+                response.body()?.let {
+                    Result.success(it)
+                }?: Result.failure(Exception("Empty Response Body"))
+            }else{
+                Result.failure(Exception("error in authentication"))
             }
         }catch (e : Exception){
             Result.failure(e)

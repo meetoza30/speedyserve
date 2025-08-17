@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.clubsconnect.FrontEnd.commonscreen.SplashScreen.SplashScreen
 import com.example.speedyserve.Screen.AuthScreens.LoginScreen
 import com.example.speedyserve.Screen.AuthScreens.SignUpScreen
 import com.example.speedyserve.Screen.MainScreen.HomeScreen
@@ -18,7 +19,11 @@ import com.speedyserve.ui.screens.MenuScreen
 fun NavigationApp(navController : NavHostController,
                   modifier: Modifier = Modifier) {
     val AuthVM : AuthVM = hiltViewModel()
-    NavHost(navController = navController , startDestination = Screen.HOMESCREEN.name ) {
+    NavHost(navController = navController , startDestination = Screen.SPLASHSCREEN.name ) {
+
+        composable (route = Screen.SPLASHSCREEN.name){
+            SplashScreen(hiltViewModel(),navController)
+        }
 
         //authScreens
          composable(route = Screen.SIGNIN.name) {
@@ -28,7 +33,7 @@ fun NavigationApp(navController : NavHostController,
          }
 
         composable(route = Screen.SIGNUP.name) {
-                SignUpScreen(AuthVM)
+                SignUpScreen(AuthVM, navController = navController)
         }
 
         //canteenScreens
