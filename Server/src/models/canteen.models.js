@@ -29,8 +29,11 @@ const canteenSchema = new mongoose.Schema({
         type: String,  
         
     },
+    stoves : {type : Number}, 
    slots: [{ type: mongoose.Schema.Types.ObjectId, ref: "Slot" }]
 }, { timestamps: true });
+
+//rating, image, short description,  
 
 canteenSchema.methods.getJWToken = async function(){
     const canteen = this;

@@ -14,4 +14,6 @@ const dishSchema = new Schema({
 
 }, {timestamps : true});
 
+//dish image, dish rating
+
 export const Dish = model("Dish", dishSchema);
