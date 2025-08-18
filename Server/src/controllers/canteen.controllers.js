@@ -8,226 +8,216 @@ import {Order} from '../models/order.models.js'
 
 const CANTEEN_SAFE_DATA = "name mobile emailId openingTime closingTime";
 
-
-// Helper: MinHeap for stove times
+//handles the availability of stoves
 class MinHeap {
-    constructor() { this.heap = []; }
-    push(val) { this.heap.push(val); this.bubbleUp(this.heap.length - 1); }
-    pop() {
-        if (this.heap.length === 1) return this.heap.pop();
-        const top = this.heap[0];
-        this.heap[0] = this.heap.pop();
-        this.bubbleDown(0);
-        return top;
-    }
-    bubbleUp(i) {
-        while (i > 0) {
-            let p = Math.floor((i - 1) / 2);
-            if (this.heap[p] <= this.heap[i]) break;
-            [this.heap[p], this.heap[i]] = [this.heap[i], this.heap[p]];
-            i = p;
-        }
-    }
-    bubbleDown(i) {
-        const len = this.heap.length;
-        while (true) {
-            let left = 2 * i + 1, right = 2 * i + 2, smallest = i;
-            if (left < len && this.heap[left] < this.heap[smallest]) smallest = left;
-            if (right < len && this.heap[right] < this.heap[smallest]) smallest = right;
-            if (smallest === i) break;
-            [this.heap[i], this.heap[smallest]] = [this.heap[smallest], this.heap[i]];
-            i = smallest;
-        }
-    }
-}
-
-// helper function: convert HH:mm string to Date (today's date)
-function getTodayTime(timeStr) {
-    const [hour, minute] = timeStr.split(":").map(Number);
-    const d = new Date();
-    d.setHours(hour, minute, 0, 0);
-    return d;
-}
-
-function generateSlotTimes(startTime, closingTime, intervalMinutes = 15) {
-  const slots = [];
-  let current = new Date(startTime);
-
-  while (current <= closingTime) {
-    slots.push(new Date(current)); // push as Date object
-    current = new Date(current.getTime() + intervalMinutes * 60 * 1000); // add interval
+  constructor() { this.h = []; }
+  push(v){ this.h.push(v); this._up(this.h.length-1); }
+  pop(){
+    if(this.h.length===0) return undefined;
+    const top = this.h[0];
+    const last = this.h.pop();
+    if(this.h.length){ this.h[0]=last; this._down(0); }
+    return top;
   }
+  _up(i){ while(i>0){ const p=(i-1>>1); if(this.h[p]<=this.h[i]) break; [this.h[p],this.h[i]]=[this.h[i],this.h[p]]; i=p; } }
+  _down(i){ const n=this.h.length; for(;;){ let s=i, l=i*2+1, r=l+1;
+    if(l<n && this.h[l]<this.h[s]) s=l;
+    if(r<n && this.h[r]<this.h[s]) s=r;
+    if(s===i) break;
+    [this.h[i],this.h[s]]=[this.h[s],this.h[i]]; i=s;
+  }}
+  size(){ return this.h.length; }
+}
 
+//some util functns that will be used below in the main logic
+
+const MS_PER_MIN = 60_000;
+
+function toHHMM(date, timeZone = "Asia/Kolkata") {
+  return date.toLocaleTimeString("en-IN", { hour12: false, hour: "2-digit", minute: "2-digit", timeZone });
+}
+
+function parseHHMMForDate(base, hhmm) {
+  const [h, m] = hhmm.split(":").map(Number);
+  const d = new Date(base);
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
+function addMinutes(date, mins) {
+  return new Date(date.getTime() + mins * MS_PER_MIN);
+}
+
+function roundUpToInterval(date, intervalMinutes) {
+  const t = date.getTime();
+  const q = Math.ceil(t / (intervalMinutes * MS_PER_MIN));
+  return new Date(q * intervalMinutes * MS_PER_MIN);
+}
+
+//some more utils
+
+function resolveServiceWindow(openingHHMM, closingHHMM, now = new Date()) {
+  let open = parseHHMMForDate(now, openingHHMM);
+  let close = parseHHMMForDate(now, closingHHMM);
+  if (close <= open) close = addMinutes(close, 24 * 60); // overnight
+
+  if (now < open) {
+    // window later today
+    return { open, close };
+  }
+  if (now >= open && now < close) {
+    // currently in window
+    return { open, close };
+  }
+  // window is over; move to next day's window
+  open = addMinutes(open, 24 * 60);
+  close = addMinutes(close, 24 * 60);
+  return { open, close };
+}
+
+// Generate 15-min slots between [start, close], aligned on 15-min grid
+function generateSlots(start, close, intervalMinutes) {
+  const alignedStart = roundUpToInterval(start, intervalMinutes);
+  const slots = [];
+  let cur = alignedStart;
+  while (cur < close) {
+    const end = addMinutes(cur, intervalMinutes);
+    if (end <= close) {
+      slots.push({ start: new Date(cur), end: new Date(end) });
+    }
+    cur = end;
+  }
   return slots;
 }
 
-async function getAvailableSlots(canteenId, orderedDishes, bufferMinutes, slotDurationMinutes, stoveCount, closingTime, openingTime) {
-    // Fetch dish details for serve times
-    const dishDetails = await Dish.find({ _id: { $in: orderedDishes.map(d => d.dishId) } })
-        .select("serveTime");
-        console.log("dishDetails : ", dishDetails);
-
-    const dishesWithPrepTime = orderedDishes.map(d => {
-        const dish = dishDetails.find(x => x._id.toString() === d.dishId.toString());
-        return { serveTime: dish.serveTime, quantity: d.quantity };
-    });
-    const openingDate = getTodayTime(openingTime)
-    const closingDate = getTodayTime(closingTime)
-
-    console.log("dishesWithPrepTime : ", dishesWithPrepTime)
-
-    // Initialize stoves with current time
-    const now = Date.now();
-    const stoves = new MinHeap();
-    for (let i = 0; i < stoveCount; i++) stoves.push(now);
-
-    let maxFinishTime = openingDate; 
-    // const slotTimes = generateSlotTimes(openingDate, closingDate);
-    // Assign dishes to earliest free stove
-   // Assign dishes to earliest free stove
-for (let { serveTime, quantity } of dishesWithPrepTime) {
-  for (let q = 0; q < quantity; q++) {
-    const earliestFree = stoves.pop(); // take earliest available stove time
-    const finishTime = earliestFree + (serveTime * 60 * 1000); // add dish prep time
-    maxFinishTime = Math.max(maxFinishTime, finishTime);
-    console.log("maxFinishTime : ", new Date(maxFinishTime));
-    stoves.push(finishTime + bufferMinutes * 60 * 1000); // put stove back with buffer
-  }
-}
-
-
-    const earliestPickup = new Date(maxFinishTime);
-
-    // Convert closingTime string → Date object
-    // const [closeHour, closeMinute] = closingTime.split(":").map(Number);
-
- 
-    console.log("closing date : ", closingDate)
-    // closingDate.setHours(closeHour, closeMinute, 0, 0);
-
-    let slots = [];
-    let current = earliestPickup.getTime();
-
-    while (current + slotDurationMinutes * 60000 <= closingDate.getTime()) {
-        const slotStart = new Date(current);
-        const slotEnd = new Date(current + slotDurationMinutes * 60000);
-
-        const existingSlot = await Slot.findOne({ 
-            startTime: slotStart.toTimeString().slice(0,5)
-        });
-
-        const orderCount = await Order.countDocuments({ timeSlot: slotStart.toTimeString().slice(0,5) });
-
-        if (!existingSlot || existingSlot.maxOrders > orderCount) {
-            slots.push({ startTime: slotStart, endTime: slotEnd });
-        }
-
-        current += slotDurationMinutes * 60000;
-    }
-
-    return { earliestPickup, slots };
-}
-
-function addMinutes(date, minutes) {
-  return new Date(date.getTime() + minutes * 60000);
-}
-
-// ---------------- Controller Logic ----------------
-const generateAvailableSlots = async (req, res) => {
+const getSlots = async (req, res) => {
   try {
     const { canteenId, orderedDishes } = req.body;
-
-    // Fetch canteen details (e.g., opening, closing, buffer, slot duration)
-    const canteen = await Canteen.findById(canteenId);
-    if (!canteen) return res.status(404).json({ message: "Canteen not found" });
-
-    const { openingTime, closingTime, bufferMinutes = 5, slotDurationMinutes = 15 } = canteen;
-
-    // Fetch dish details
-    const dishIds = orderedDishes.map(d => d.dishId);
-    const dishDetails = await Dish.find({ _id: { $in: dishIds } }, { serveTime: 1 });
-
-    // Map serveTime × quantity
-    const dishesWithPrepTime = orderedDishes.map(order => {
-      const dish = dishDetails.find(d => d._id.toString() === order.dishId);
-      return { serveTime: dish.serveTime, quantity: order.quantity };
-    });
-
-    // Calculate total required preparation time
-    const maxFinishTime = dishesWithPrepTime.reduce(
-      (acc, d) => acc + (d.serveTime * d.quantity),
-      0
-    );
-
-    // Earliest pickup time = now + total prep time + buffer
-    const now = new Date();
-    const earliestPickup = addMinutes(now, maxFinishTime + bufferMinutes);
-
-    // Generate all slots between opening & closing
-    let slotStart = new Date(openingTime);
-    let slotEnd = addMinutes(slotStart, slotDurationMinutes);
-    const slots = [];
-
-    while (slotEnd <= new Date(closingTime)) {
-      slots.push({
-        canteenId,
-        startTime: slotStart,
-        endTime: slotEnd,
-        maxOrders: canteen.maxOrdersPerSlot || 10 // default fallback
-      });
-      slotStart = slotEnd;
-      slotEnd = addMinutes(slotStart, slotDurationMinutes);
+    if (!mongoose.Types.ObjectId.isValid(canteenId)) {
+      return res.status(400).json({ error: "Invalid canteenId" });
+    }
+    if (!Array.isArray(orderedDishes) || orderedDishes.length === 0) {
+      return res.status(400).json({ error: "orderedDishes is required" });
     }
 
-    // Optional: Store slots in DB (if you want to persist them)
-    // await Slot.insertMany(slots);
+    // Configs (could be stored per-canteen)
+    const slotDurationMinutes = 15;
+    const defaultBufferMinutes = 5;
 
-    const earliestPickupFormatted = new Date(earliestPickup).toLocaleTimeString("en-IN", {
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false
-});
+    // 1) Fetch canteen
+    const canteen = await Canteen.findById(canteenId).lean();
+    if (!canteen) return res.status(404).json({ error: "Canteen not found" });
 
-    res.json({
-      earliestPickupFormatted,
-      availableSlots: slots
+    const openingTime = canteen.openingTime; // "HH:mm"
+    const closingTime = canteen.closingTime; // "HH:mm"
+    const stoveCount = Number(canteen.stoves) || 1;
+    const bufferMinutes = Number(canteen.bufferMinutes) || defaultBufferMinutes;
+    const maxOrdersPerSlot = Number(canteen.maxOrdersPerSlot) || stoveCount; // sensible default
+
+    if (!openingTime || !closingTime) {
+      return res.status(400).json({ error: "Canteen openingTime/closingTime not set" });
+    }
+
+    // 2) Resolve today's/next window
+    const now = new Date();
+    const { open, close } = resolveServiceWindow(openingTime, closingTime, now);
+
+    // Service can start at max(now, open)
+    const serviceStart = now < open ? open : now;
+
+    // 3) Fetch dishes & build list of units to schedule
+    const dishIds = orderedDishes.map(d => d.dishId);
+    const dishes = await Dish.find({ _id: { $in: dishIds } }).select("_id serveTime").lean();
+
+
+
+    const units = [];
+    for (const od of orderedDishes) {
+      const dish = dishes.find(dd => dd._id.toString() === od.dishId);
+      const serve = Number(dish.serveTime);
+      if (!Number.isFinite(serve) || serve <= 0) {
+        return res.status(400).json({ error: `Invalid serveTime for dish ${od.dishId}` });
+      }
+      const qty = Number(od.quantity) || 0;
+      for (let i = 0; i < qty; i++) units.push(serve);
+    }
+
+    // 4) Simulate cooking using a min-heap of stove free-times
+    const heap = new MinHeap();
+    for (let i = 0; i < stoveCount; i++) heap.push(serviceStart.getTime());
+
+    let maxFinish = serviceStart.getTime();
+    for (const serveMin of units) {
+      const earliestFree = heap.pop();                // earliest stove free time (ms)
+      const finish = earliestFree + serveMin * MS_PER_MIN;
+      if (finish > maxFinish) maxFinish = finish;
+      // Add buffer before this stove is considered free again
+      heap.push(finish + bufferMinutes * MS_PER_MIN);
+    }
+
+    const earliestFinish = new Date(maxFinish);
+    const earliestPickupSlotStart = roundUpToInterval(earliestFinish, slotDurationMinutes);
+
+    // If cooking finishes after closing, no slots
+    if (earliestPickupSlotStart >= close) {
+      return res.json({
+        earliestPickup: {
+          iso: earliestFinish.toISOString(),
+          hhmm: toHHMM(earliestFinish)
+        },
+        earliestPickupSlot: null,
+        slots: []
+      });
+    }
+
+    // 5) Generate candidate slots from earliestPickupSlotStart to close
+    const allSlots = generateSlots(earliestPickupSlotStart, close, slotDurationMinutes);
+
+    // 6) Get already booked counts for these slots (by HH:mm) for *this window only*
+    const slotKeys = allSlots.map(s => toHHMM(s.start)); // "HH:mm"
+    const counts = await Order.aggregate([
+      {
+        $match: {
+          canteenId: new mongoose.Types.ObjectId(canteenId),
+          timeSlot: { $in: slotKeys },                // stored as "HH:mm"
+          createdAt: { $gte: open, $lt: close }       // only today's window
+        }
+      },
+      { $group: { _id: "$timeSlot", c: { $sum: 1 } } }
+    ]);
+    const bookedMap = new Map(counts.map(x => [x._id, x.c]));
+
+    // 7) Filter by capacity
+    const available = allSlots.filter(s => {
+      const key = toHHMM(s.start);
+      const used = bookedMap.get(key) || 0;
+      return used < maxOrdersPerSlot;
+    });
+
+    // Format output
+    const slots = available.map(s => ({
+      startISO: s.start.toISOString(),
+      endISO: s.end.toISOString(),
+      startHHMM: toHHMM(s.start),
+      endHHMM: toHHMM(s.end)
+    }));
+
+    return res.json({
+      earliestPickup: {
+        iso: earliestFinish.toISOString(),
+        hhmm: toHHMM(earliestFinish)
+      },
+      earliestPickupSlot: {
+        iso: earliestPickupSlotStart.toISOString(),
+        hhmm: toHHMM(earliestPickupSlotStart)
+      },
+      slots
     });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    console.error("getSlots error:", err);
+    return res.status(500).json({ error: "Server error", details: err.message });
   }
-};
-
-
-// Controller
-const getSlots = async (req, res) => {
-    try {
-        const { canteenId, orderedDishes } = req.body;
-        console.log("orderedDishes : ", orderedDishes);
-        const slotDurationMinutes = 15, bufferMinutes = 5;
-
-        const canteen = await Canteen.findById(canteenId);
-        if (!canteen) return res.status(404).json({ error: "Canteen not found" });
-
-        const { stoveCount, closingTime, openingTime } = canteen; 
-        console.log("closing time : ", closingTime);
-
-        const { earliestPickup, slots } = await getAvailableSlots(
-            canteenId,
-            orderedDishes,
-            bufferMinutes,
-            slotDurationMinutes,
-            stoveCount,
-            closingTime,
-            openingTime
-        );
-
-        res.json({ earliestPickup, slots });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Server error" });
-    }
 };
 
 
@@ -397,4 +387,4 @@ const removeDish = async (req, res) => {
     }};
 
 
-export {registerCanteen, loginCanteen, updateCanteen, getCanteens, getCanteensWithDishes, generateAvailableSlots, addDish, removeDish, getSlots} ;
+export {registerCanteen, loginCanteen, updateCanteen, getCanteens, getCanteensWithDishes, addDish, removeDish, getSlots} ;

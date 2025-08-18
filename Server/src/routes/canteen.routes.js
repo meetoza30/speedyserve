@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getCanteens, getCanteensWithDishes, loginCanteen, registerCanteen, addDish, getSlots, updateCanteen, removeDish, generateAvailableSlots } from "../controllers/canteen.controllers.js";
+import { getCanteens, getCanteensWithDishes, loginCanteen, registerCanteen, addDish, getSlots, updateCanteen, removeDish } from "../controllers/canteen.controllers.js";
 import { loginValidation, registerValidation } from "../middlewares/auth.validation.js";
 import upload from "../utils/multer.js";
 const canteenRouter = Router();
@@ -10,7 +10,7 @@ canteenRouter.route('/getCanteenDishes').post(getCanteensWithDishes)
 canteenRouter.route('/getCanteens').get(getCanteens)
 canteenRouter.route('/updateCanteen').post(updateCanteen)
 canteenRouter.route('/removeDish').post(removeDish)
-canteenRouter.route('/getSlots').post(generateAvailableSlots);
+canteenRouter.route('/getSlots').post(getSlots);
 canteenRouter.route('/addDish').post(upload.single('image'), addDish);
 // canteenRouter.route('/getPendingOrders').get()
 export default canteenRouter;
