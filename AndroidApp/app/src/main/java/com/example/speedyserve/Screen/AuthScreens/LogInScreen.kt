@@ -33,7 +33,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.speedyserve.Navigation.Screen
-import com.example.speedyserve.ViewModels.AuthVM.AuthVM
+import com.example.speedyserve.Screen.AuthScreens.AuthVM
 import kotlin.math.cos
 import kotlin.math.sin
 

@@ -4,6 +4,7 @@ import com.example.speedyserve.Models.Canteens.Canteen
 import kotlinx.serialization.Serializable
 
 data class Dish(
+    val _id : String,
     val canteenId : String,
     val name : String,
     val price : String,

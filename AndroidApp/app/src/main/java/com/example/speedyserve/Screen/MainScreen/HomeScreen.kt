@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.speedyserve.Models.Canteens.Canteen
-import com.example.speedyserve.VM.CanteenVM.HomeScreenVM
+import com.example.speedyserve.Screen.MainScreen.HomeScreenVM
 import com.example.speedyserve.ui.theme.SpeedyServeTheme
 import kotlin.math.log
 

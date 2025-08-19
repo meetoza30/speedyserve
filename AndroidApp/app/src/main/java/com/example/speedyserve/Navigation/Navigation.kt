@@ -12,7 +12,7 @@ import com.example.clubsconnect.FrontEnd.commonscreen.SplashScreen.SplashScreen
 import com.example.speedyserve.Screen.AuthScreens.LoginScreen
 import com.example.speedyserve.Screen.AuthScreens.SignUpScreen
 import com.example.speedyserve.Screen.MainScreen.HomeScreen
-import com.example.speedyserve.ViewModels.AuthVM.AuthVM
+import com.example.speedyserve.Screen.AuthScreens.AuthVM
 import com.speedyserve.ui.screens.MenuScreen
 
 @Composable

@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.speedyserve.Navigation.Screen
 import com.example.speedyserve.R
-import com.example.speedyserve.VM.SpashScreenVM.SplashScreenVM
+import com.example.speedyserve.Screen.SplashScreen.SplashScreenVM
 import kotlinx.coroutines.delay
 
 @Composable

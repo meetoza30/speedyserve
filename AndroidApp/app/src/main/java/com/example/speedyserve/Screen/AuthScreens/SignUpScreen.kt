@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.speedyserve.Navigation.Screen
-import com.example.speedyserve.ViewModels.AuthVM.AuthVM
+import com.example.speedyserve.Screen.AuthScreens.AuthVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
