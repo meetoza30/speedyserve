@@ -15,7 +15,7 @@ const orderSchema = new Schema({
     dishes: [{
         dish: { type: mongoose.Schema.Types.ObjectId, ref: "Dish" },
         quantity: { type: Number, required: true },
-        price: { type: Number, required: true },
+        price: { type: Number },
     }],
     totalPrice: {
         type: Number,
