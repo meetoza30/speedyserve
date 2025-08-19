@@ -1,5 +1,6 @@
 package com.example.speedyserve.Repo
 
+import android.util.Log
 import com.example.speedyserve.API.Apis
 import com.example.speedyserve.Models.ApiResponse.ApiResponse
 import com.example.speedyserve.Models.ApiResponse.CheckAuthResponse
@@ -10,11 +11,21 @@ import com.example.speedyserve.Models.Canteens.Canteen
 import com.example.speedyserve.Models.Canteens.CanteenResponse
 import com.example.speedyserve.Models.Dishes.DishesReq
 import com.example.speedyserve.Models.Dishes.DishesResponse
+import com.example.speedyserve.Screen.MenuScreen.dishWithQuantity
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
 import javax.inject.Inject
 
+data class CartOrder(
+    val canteenId: String ,
+    val dishWithQuantity: MutableStateFlow<List<dishWithQuantity>>
+)
 
 class Repo @Inject constructor(private val apis: Apis)  {
+    private val _cartOrderGlobal : MutableStateFlow<CartOrder?> = MutableStateFlow(null)
+    val cartOrderGlobal : StateFlow<CartOrder?> = _cartOrderGlobal
+
     suspend fun signUp(user: UserSignUpReq): Result<ApiResponse> {
         return try {
             val response = apis.signUp(user)
@@ -117,5 +128,13 @@ class Repo @Inject constructor(private val apis: Apis)  {
         }catch (e : Exception){
             Result.failure(e)
         }
+    }
+
+    fun saveCartOrder(cartOrder : MutableStateFlow<List<dishWithQuantity>>,canteenId: String){
+        _cartOrderGlobal.value = CartOrder(
+            canteenId = canteenId,
+            dishWithQuantity = cartOrder
+        )
+        Log.d("repo after sending cartorder",cartOrderGlobal.value!!.dishWithQuantity.value.toString())
     }
 }

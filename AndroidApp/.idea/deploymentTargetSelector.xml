@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="SpeedyServe.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-08-16T06:34:02.759537598Z">
+        <DropdownSelection timestamp="2025-08-19T14:29:43.211986375Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=5XNBMB794XD6C6IB" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/shadow/.android/avd/Medium_Phone.avd" />
             </handle>
           </Target>
         </DropdownSelection>

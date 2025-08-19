@@ -20,6 +20,8 @@ data class dishWithQuantity(
     val quantity : Int = 0
 )
 
+
+
 @HiltViewModel
 class MenuScreenVM @Inject constructor(private val repo: Repo) : ViewModel() {
     private val _menu : MutableStateFlow<List<dishWithQuantity>> = MutableStateFlow(emptyList())
@@ -88,8 +90,9 @@ class MenuScreenVM @Inject constructor(private val repo: Repo) : ViewModel() {
                 } else it
             }
         }else{
-            _cartOrder.value = _cartOrder.value + clickeddishWithQuantity
-            Log.d("cart order",clickeddishWithQuantity.toString())
+            val existIndexMenu =  menu.value.indexOfFirst { it.dish._id==clickeddishWithQuantity.dish._id }
+            _cartOrder.value = _cartOrder.value + menu.value.get(existIndexMenu)
+//            Log.d("cart order",clickeddishWithQuantity.toString())
         }
         Log.d("cart order",cartOrder.value.toString())
     }
@@ -110,6 +113,27 @@ class MenuScreenVM @Inject constructor(private val repo: Repo) : ViewModel() {
                 dishWithQuantity
             }
         }
+        val existIndex = _cartOrder.value.indexOfFirst { it.dish._id==clickeddishWithQuantity.dish._id }
+
+        if(existIndex>=0){
+            _cartOrder.value = _cartOrder.value.map {
+                if (it.dish._id == clickeddishWithQuantity.dish._id && it.quantity>0) {
+                    it.copy(quantity = it.quantity - 1)
+                } else it
+            }
+            if(cartOrder.value.get(existIndex).quantity==0){
+                _cartOrder.value =_cartOrder.value.filter { it.dish._id!=cartOrder.value.get(existIndex).dish._id }
+            }
+        }else{
+            onError("first add order")
+        }
+        Log.d("cart order",cartOrder.value.toString())
+
+    }
+
+    fun saveCartOrderToRepo(){
+        repo.saveCartOrder(cartOrder = _cartOrder,
+            canteenId = canteen.value._id)
     }
 
 }

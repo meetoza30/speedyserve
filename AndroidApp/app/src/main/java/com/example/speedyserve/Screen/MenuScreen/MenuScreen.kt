@@ -2,7 +2,9 @@
 
 package com.speedyserve.ui.screens
 
+import android.graphics.Paint
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.HorizontalRule
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.*
@@ -35,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.speedyserve.Screen.MenuScreen.MenuScreenVM
@@ -47,11 +51,11 @@ fun MenuScreen(
     canteenId : String,
     viewmodel : MenuScreenVM,
     onBackClick: () -> Unit = {},
-    onItemClick: (dishWithQuantity) -> Unit = {},
-    onAddToCart: (dishWithQuantity) -> Unit = {}
+    onAddToCart: () -> Unit = {}
 ) {
     val canteen by viewmodel.canteen.collectAsState()
     val dishes by viewmodel.menu.collectAsState()
+    val cartOrder by viewmodel.cartOrder.collectAsState()
     val isLoading by viewmodel.isLoading.collectAsState()
     val context  = LocalContext.current
     LaunchedEffect(Unit) {
@@ -62,6 +66,7 @@ fun MenuScreen(
     var selectedCategory by remember { mutableStateOf("Burger") }
 
     val categories = listOf("Burger", "Sandwich", "Pizza", "Sandwich")
+
 
 //    val burgerItems = listOf(
 //        FoodItem(
@@ -78,68 +83,83 @@ fun MenuScreen(
 //        )
 //    )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        // Top App Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = canteen.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(10.dp)
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(MaterialTheme.colorScheme.background)
+//    )
+    Scaffold(
+        topBar =
+            {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = canteen.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(10.dp)
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick,
+                            modifier = Modifier.padding(start = 10.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .size(40.dp)
+                                    .background(color = Color(0xFFECF0F4))
+        //                                .shadow(elevation = 2.dp, shape = CircleShape)
+                            ){
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBackIosNew,
+                                    contentDescription = "Back",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.padding(10.dp)
+                                )
+                            }
+
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { /* More options */ },
+                            modifier = Modifier.padding(end=10.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .size(40.dp)
+                                    .background(color = Color(0xFFECF0F4))
+        //                                .shadow(elevation = 2.dp, shape = CircleShape)
+                            ){
+                                Icon(
+                                    imageVector = Icons.Default.MoreHoriz,
+                                    contentDescription = "More options",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.padding(10.dp)
+                                )
+                            }
+
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
                 )
             },
-            navigationIcon = {
-                IconButton(onClick = onBackClick,
-                    modifier = Modifier.padding(start = 10.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .size(40.dp)
-                            .background(color = Color(0xFFECF0F4))
-//                                .shadow(elevation = 2.dp, shape = CircleShape)
-                    ){
-                        Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(10.dp)
-                        )
-                    }
 
+        floatingActionButton = {
+            if(cartOrder.isNotEmpty()){
+                FloatingActionButton(onClick = {viewmodel.saveCartOrderToRepo()
+               onAddToCart()}) {
+                    Icon(imageVector = Icons.Default.ShoppingCart, "add to cart")
                 }
-            },
-            actions = {
-                IconButton(onClick = { /* More options */ },
-                    modifier = Modifier.padding(end=10.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .size(40.dp)
-                            .background(color = Color(0xFFECF0F4))
-//                                .shadow(elevation = 2.dp, shape = CircleShape)
-                    ){
-                        Icon(
-                            imageVector = Icons.Default.MoreHoriz,
-                            contentDescription = "More options",
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(10.dp)
-                        )
-                    }
+            }
+        }
 
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
-        )
-
+    ) {padding->
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Restaurant Header Image
@@ -289,34 +309,45 @@ fun MenuScreen(
                     )
                 }
             }
-
-            // Food Items Grid (2 columns)
-            items(dishes.chunked(2)) { rowItems ->
-                Row(
-                    modifier = Modifier
+            if(isLoading){
+                item{
+                    CircularProgressIndicator(modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    rowItems.forEach { item ->
-                        FoodItemCard(
-                            item = item,
-                           onClickAdd = {viewmodel.onClickAdd(item)},
-                            onClickReduce = {viewmodel.onClickMinus(item){
-                                Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
-                            }
-                                            },
-                            onAddToCart = { onAddToCart(item) },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
+//                        align(Alignment.CenterHorizontally)
+                        .padding(160.dp)
+                    )
+                }
 
-                    // Fill remaining space if odd number of items
-                    if (rowItems.size == 1) {
-                        Spacer(modifier = Modifier.weight(1f))
+            }else{
+                // Food Items Grid (2 columns)
+                items(dishes.chunked(2)) { rowItems ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        rowItems.forEach { item ->
+                            FoodItemCard(
+                                item = item,
+                                onClickAdd = {viewmodel.onClickAdd(item)},
+                                onClickReduce = {viewmodel.onClickMinus(item){
+                                    Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
+                                }
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        // Fill remaining space if odd number of items
+                        if (rowItems.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                     }
                 }
+
             }
+
 
             // Bottom padding for FAB
             item {
@@ -331,7 +362,6 @@ fun FoodItemCard(
     item: dishWithQuantity,
     onClickAdd : ()-> Unit,
     onClickReduce : ()->Unit,
-    onAddToCart: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -528,6 +558,7 @@ fun ScaleAnimationQuantityButton(
         }
     }
 }
+
 
 //
 //@Preview(showBackground = true)

@@ -2,6 +2,7 @@
 
 package com.speedyserve.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,12 +22,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.speedyserve.Screen.CartScreen.CartVm
+import com.example.speedyserve.Screen.MenuScreen.dishWithQuantity
 import com.example.speedyserve.ui.theme.SpeedyServeTheme
 
 
@@ -43,72 +47,21 @@ data class CartItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
+    viewModel : CartVm,
     onBackClick: () -> Unit = {},
     onPlaceOrder: () -> Unit = {},
     onEditAddress: () -> Unit = {},
     onViewBreakdown: () -> Unit = {},
-    onRemoveItem: (CartItem) -> Unit = {},
-    onUpdateQuantity: (CartItem, Int) -> Unit = {
-            _, _ ->
-    }
 ) {
-    var cartItems by remember {
-        mutableStateOf(
-            listOf(
-                CartItem(
-                    id = "1",
-                    name = "Pizza Calzone European",
-                    description = "European",
-                    price = 64.0,
-                    size = "14\"",
-                    quantity = 2
-                ),
-                CartItem(
-                    id = "2",
-                    name = "Pizza Calzone European",
-                    description = "European",
-                    price = 32.0,
-                    size = "14\"",
-                    quantity = 1
-                )
-                ,
-                CartItem(
-                    id = "2",
-                    name = "Pizza Calzone European",
-                    description = "European",
-                    price = 32.0,
-                    size = "14\"",
-                    quantity = 1
-                ),
-                CartItem(
-                    id = "2",
-                    name = "Pizza Calzone European",
-                    description = "European",
-                    price = 32.0,
-                    size = "14\"",
-                    quantity = 1
-                ),
-                CartItem(
-                    id = "2",
-                    name = "Pizza Calzone European",
-                    description = "European",
-                    price = 32.0,
-                    size = "14\"",
-                    quantity = 1
-                ),
-                CartItem(
-                    id = "2",
-                    name = "Pizza Calzone European",
-                    description = "European",
-                    price = 32.0,
-                    size = "14\"",
-                    quantity = 1
-                )
-            )
-        )
+    val cartDishes  = viewModel.cartDishes.collectAsState()
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.fetchDishes {
+            Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
+        }
     }
 
-    val total = cartItems.sumOf { it.price * it.quantity }
+    val total = cartDishes.value.sumOf { it.quantity * it.dish.price.toInt() }
 
     Column(
         modifier = Modifier
@@ -167,18 +120,19 @@ fun CartScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(16.dp)
         ) {
-            items(cartItems) { item ->
+            items(cartDishes.value) { item ->
                 CartItemCard(
                     item = item,
-                    onRemove = { onRemoveItem(item) },
-                    onQuantityChange = { newQuantity ->
-                        onUpdateQuantity(item, newQuantity)
-                        cartItems = cartItems.map { cartItem ->
-                            if (cartItem.id == item.id) {
-                                cartItem.copy(quantity = newQuantity)
-                            } else cartItem
+                    onAdd = {
+                        viewModel.onClickAdd(item)
+                    },
+                    onDecrease = {
+                        viewModel.onClickMinus(item){
+                            Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
                         }
-                    }
+                    },
+                    onRemove = {},
+                    onQuantityChange = {}
                 )
             }
         }
@@ -304,7 +258,9 @@ fun CartScreen(
 
 @Composable
 fun CartItemCard(
-    item: CartItem,
+    item: dishWithQuantity,
+    onAdd : ()-> Unit,
+    onDecrease : ()-> Unit,
     onRemove: () -> Unit,
     onQuantityChange: (Int) -> Unit
 ) {
@@ -339,7 +295,7 @@ fun CartItemCard(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = item.name,
+                    text = item.dish.name,
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Medium
                     ),
@@ -351,7 +307,7 @@ fun CartItemCard(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = item.description,
+                    text = item.dish.description,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -359,7 +315,7 @@ fun CartItemCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "$${item.price.toInt()}",
+                    text = "$${item.dish.price.toInt()}",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),
@@ -374,11 +330,11 @@ fun CartItemCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = item.size,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+//                    Text(
+//                        text = item.size,
+//                        style = MaterialTheme.typography.bodyMedium,
+//                        color = MaterialTheme.colorScheme.onSurfaceVariant
+//                    )
 
                     // Quantity Controls
                     Row(
@@ -386,11 +342,7 @@ fun CartItemCard(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         IconButton(
-                            onClick = {
-                                if (item.quantity > 1) {
-                                    onQuantityChange(item.quantity - 1)
-                                }
-                            },
+                            onClick = onDecrease,
                             modifier = Modifier.size(32.dp)
                         ) {
                             Box(
@@ -421,7 +373,7 @@ fun CartItemCard(
                         )
 
                         IconButton(
-                            onClick = { onQuantityChange(item.quantity + 1) },
+                            onClick = onAdd,
                             modifier = Modifier.size(32.dp)
                         ) {
                             Box(
@@ -469,18 +421,18 @@ fun CartItemCard(
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun CartScreenPreview() {
-    SpeedyServeTheme {
-        CartScreen()
-    }
-}
-
-@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun CartScreenDarkPreview() {
-    SpeedyServeTheme(darkTheme = true) {
-        CartScreen()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun CartScreenPreview() {
+//    SpeedyServeTheme {
+//        CartScreen()
+//    }
+//}
+//
+//@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+//@Composable
+//fun CartScreenDarkPreview() {
+//    SpeedyServeTheme(darkTheme = true) {
+//        CartScreen()
+//    }
+//}

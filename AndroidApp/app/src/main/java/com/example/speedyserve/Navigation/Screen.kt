@@ -6,5 +6,6 @@ enum class Screen {
     SIGNIN,
     HOMESCREEN,
     MENUSCREEN,
+    CARTSCREEN
 
 }

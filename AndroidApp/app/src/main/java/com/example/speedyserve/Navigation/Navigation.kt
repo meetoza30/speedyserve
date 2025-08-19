@@ -1,5 +1,6 @@
 package com.example.speedyserve.Navigation
 
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -13,6 +14,7 @@ import com.example.speedyserve.Screen.AuthScreens.LoginScreen
 import com.example.speedyserve.Screen.AuthScreens.SignUpScreen
 import com.example.speedyserve.Screen.MainScreen.HomeScreen
 import com.example.speedyserve.Screen.AuthScreens.AuthVM
+import com.speedyserve.ui.screens.CartScreen
 import com.speedyserve.ui.screens.MenuScreen
 
 @Composable
@@ -47,7 +49,17 @@ fun NavigationApp(navController : NavHostController,
         composable(route = "${Screen.MENUSCREEN.name}/{canteenId}") {
             backstackEntry->
             val canteenId = backstackEntry.arguments?.getString("canteenId")?:""
-            MenuScreen(canteenId = canteenId, viewmodel = hiltViewModel())
+            MenuScreen(canteenId = canteenId, viewmodel = hiltViewModel(), onAddToCart = {navController.navigate(
+                Screen.CARTSCREEN.name)}, onBackClick = {
+                    navController.navigate(Screen.HOMESCREEN.name){
+                        popUpTo(0){inclusive=true}
+                        launchSingleTop = true
+                    }
+            })
+        }
+
+        composable(route = Screen.CARTSCREEN.name ){
+            CartScreen(hiltViewModel(), onBackClick = {navController.navigateUp()})
         }
 
 
