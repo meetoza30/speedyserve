@@ -58,7 +58,9 @@ class MenuScreenVM @Inject constructor(private val repo: Repo) : ViewModel() {
                         _menu.value = _menu.value.map {dishWithQuantity ->
                             globalOrder.value!!.dishWithQuantity.value.find { dishWithQuantity.dish._id==it.dish._id }?:dishWithQuantity
                         }
+                        _cartOrder.value = globalOrder.value!!.dishWithQuantity.value
                     }
+
 
                     Log.d("dishes",result.dishes.toString())
                     isLoading.value=false
