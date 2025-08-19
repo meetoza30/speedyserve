@@ -50,6 +50,16 @@ class MenuScreenVM @Inject constructor(private val repo: Repo) : ViewModel() {
                         dishWithQuantity(dish)
                     }
                     _canteen.value = result.canteen
+
+
+                    //checking if there is any global order already in cart and swappin it
+                    val globalOrder = repo.cartOrderGlobal
+                    if(globalOrder.value!=null){
+                        _menu.value = _menu.value.map {dishWithQuantity ->
+                            globalOrder.value!!.dishWithQuantity.value.find { dishWithQuantity.dish._id==it.dish._id }?:dishWithQuantity
+                        }
+                    }
+
                     Log.d("dishes",result.dishes.toString())
                     isLoading.value=false
                 }

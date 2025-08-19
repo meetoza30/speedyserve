@@ -60,6 +60,11 @@ fun CartScreen(
             Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
         }
     }
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.updateRepo()
+        }
+    }
 
     val total = cartDishes.value.sumOf { it.quantity * it.dish.price.toInt() }
 

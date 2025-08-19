@@ -23,7 +23,7 @@ data class CartOrder(
 )
 
 class Repo @Inject constructor(private val apis: Apis)  {
-    private val _cartOrderGlobal : MutableStateFlow<CartOrder?> = MutableStateFlow(null)
+   val _cartOrderGlobal : MutableStateFlow<CartOrder?> = MutableStateFlow(null)
     val cartOrderGlobal : StateFlow<CartOrder?> = _cartOrderGlobal
 
     suspend fun signUp(user: UserSignUpReq): Result<ApiResponse> {

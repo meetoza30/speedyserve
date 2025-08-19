@@ -2,9 +2,11 @@ package com.example.speedyserve.Screen.CartScreen
 
 import android.util.Log
 import android.view.View
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.speedyserve.Repo.CartOrder
 import com.example.speedyserve.Repo.Repo
 import com.example.speedyserve.Screen.MenuScreen.dishWithQuantity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,6 +69,15 @@ class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
         }
         if (cartDishes.value.first { it.dish._id == clickeddishWithQuantity.dish._id }.quantity==0){
             _cartDishes.value=_cartDishes.value.filter { it.dish._id!=clickeddishWithQuantity.dish._id }
+        }
+    }
+
+    fun updateRepo(){
+        if(_canteenId.value!=null) {
+            repo._cartOrderGlobal.value = CartOrder(
+                canteenId = _canteenId.value!!,
+                dishWithQuantity = _cartDishes
+            )
         }
     }
 }
