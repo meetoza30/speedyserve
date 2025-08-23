@@ -59,10 +59,12 @@ fun CartScreen(
         viewModel.fetchDishes {
             Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
         }
+
     }
     DisposableEffect(Unit) {
         onDispose {
             viewModel.updateRepo()
+
         }
     }
 

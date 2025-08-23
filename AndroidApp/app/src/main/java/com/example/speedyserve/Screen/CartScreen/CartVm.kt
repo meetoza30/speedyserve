@@ -6,12 +6,18 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.speedyserve.Models.ApiResponse.dishslotReq
+import com.example.speedyserve.Models.ApiResponse.getSlotReq
+import com.example.speedyserve.Models.ApiResponse.getSlotRes
 import com.example.speedyserve.Repo.CartOrder
 import com.example.speedyserve.Repo.Repo
+import com.example.speedyserve.Screen.AuthScreens.LoginScreen
 import com.example.speedyserve.Screen.MenuScreen.dishWithQuantity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.plus
 
@@ -33,6 +39,7 @@ class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
             Log.d("Cart","Repo cartorderglobal is null")
         }else{
             _cartDishes.value = cartOrder.value
+
         }
 
         if (canteenId==null){
@@ -40,6 +47,8 @@ class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
             Log.d("Cart","Repo cartorderglobal is null")
         }else{
             _canteenId.value = canteenId
+            Log.d("getslot","canteenId $canteenId")
+            getSlotDetailes()
         }
 
     }
@@ -79,5 +88,23 @@ class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
                 dishWithQuantity = _cartDishes
             )
         }
+    }
+
+    fun getSlotDetailes(){
+        val slotDishes = cartDishes.value.map {
+            dishslotReq(
+                dishId = it.dish._id,
+                quantity = it.quantity
+            )
+        }
+        viewModelScope.launch {
+            val result = repo.getSlots(getSlotReq(
+                canteenId = _canteenId.value?:"",
+                slotDishes
+            ))
+            Log.d("getslots",result.toString())
+        }
+
+
     }
 }
