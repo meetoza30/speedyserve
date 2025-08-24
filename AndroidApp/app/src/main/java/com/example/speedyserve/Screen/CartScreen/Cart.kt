@@ -2,17 +2,27 @@
 
 package com.speedyserve.ui.screens
 
+import android.icu.text.DateFormat
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Remove
@@ -23,15 +33,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.speedyserve.Models.ApiResponse.Slot
 import com.example.speedyserve.Screen.CartScreen.CartVm
 import com.example.speedyserve.Screen.MenuScreen.dishWithQuantity
 import com.example.speedyserve.ui.theme.SpeedyServeTheme
+import com.example.speedyserve.utils.convertTimeFormat
+import kotlinx.coroutines.launch
 
 
 data class CartItem(
@@ -44,16 +58,26 @@ data class CartItem(
     val imageRes: Int? = null
 )
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
     viewModel : CartVm,
     onBackClick: () -> Unit = {},
     onPlaceOrder: () -> Unit = {},
-    onEditAddress: () -> Unit = {},
     onViewBreakdown: () -> Unit = {},
 ) {
     val cartDishes  = viewModel.cartDishes.collectAsState()
+    val timeSlots = viewModel.slots.collectAsState()
+    var selectedTimeSlot = viewModel.selectedSlot.collectAsState()
+    var updatedSelectedTimeSlot by remember { mutableStateOf(selectedTimeSlot.value) }
+
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope ()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    val scrollState = rememberScrollState()
+
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.fetchDishes {
@@ -61,6 +85,7 @@ fun CartScreen(
         }
 
     }
+
     DisposableEffect(Unit) {
         onDispose {
             viewModel.updateRepo()
@@ -90,7 +115,8 @@ fun CartScreen(
                 IconButton(onClick = onBackClick,
                     modifier = Modifier.padding(start = 10.dp)) {
                     Box(
-                        modifier = Modifier.clip(CircleShape)
+                        modifier = Modifier
+                            .clip(CircleShape)
                             .size(50.dp)
                             .background(color = Color(0xFFECF0F4))
 //                                .shadow(elevation = 2.dp, shape = CircleShape)
@@ -144,6 +170,8 @@ fun CartScreen(
             }
         }
 
+
+
         // Bottom Section with Address and Total
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -160,34 +188,239 @@ fun CartScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onEditAddress() },
+                        .clickable { },
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "DELIVERY ADDRESS",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                letterSpacing = 1.sp
-                            ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "2118 Thornridge Cir, Syracuse",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+                        if(selectedTimeSlot.value.startHHMM==""){
+                            CircularProgressIndicator()
+                        }else{
+                            Text(
+                                text = "Selected Pickup Time Slot",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    letterSpacing = 1.sp
+                                ),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "${convertTimeFormat(selectedTimeSlot.value.startHHMM)} - ${convertTimeFormat(selectedTimeSlot.value.endHHMM)}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        }
 
-                    TextButton(onClick = onEditAddress) {
+
+                    TextButton(onClick = {showBottomSheet=true
+                   }) {
                         Text(
-                            text = "EDIT",
+                            text = "CHANGE",
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.labelMedium.copy(
                                 fontWeight = FontWeight.Medium
                             )
                         )
+                    }
+                }
+
+
+                if(showBottomSheet){
+
+                    ModalBottomSheet(
+                        onDismissRequest = { showBottomSheet = false },
+                        sheetState = sheetState,
+//                        windowInsets = WindowInsets(0),
+                        dragHandle = {
+                            Surface(
+                                modifier = Modifier.padding(vertical = 11.dp),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier.size(
+                                        width = 32.dp,
+                                        height = 4.dp
+                                    )
+                                )
+                            }
+                        }
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.8f)
+                                .padding(horizontal = 24.dp)
+                                .padding(bottom = 24.dp)
+                        ) {
+                            // Header
+                            Text(
+                                text = "Select Time Slot",
+                                style = MaterialTheme.typography.headlineSmall.copy(
+                                    fontWeight = FontWeight.Medium
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.padding(bottom = 24.dp, start = 10.dp, top = 10.dp)
+                            )
+
+                            // Time slots list
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                                        ,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                itemsIndexed(timeSlots.value) { index, slot ->
+                                    val isSelected = updatedSelectedTimeSlot == slot
+
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .selectable(
+                                                selected = isSelected,
+                                                onClick = { updatedSelectedTimeSlot = slot },
+                                                role = Role.RadioButton
+                                            ),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = if (isSelected) {
+                                                MaterialTheme.colorScheme.primaryContainer
+                                            } else {
+                                                MaterialTheme.colorScheme.surface
+                                            }
+                                        ),
+                                        border = if (isSelected) {
+                                            BorderStroke(
+                                                width = 2.dp,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                        } else {
+                                            BorderStroke(
+                                                width = 1.dp,
+                                                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+                                            )
+                                        },
+                                        elevation = CardDefaults.cardElevation(
+                                            defaultElevation = if (isSelected) 8.dp else 2.dp
+                                        )
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            RadioButton(
+                                                selected = isSelected,
+                                                onClick = null,
+                                                colors = RadioButtonDefaults.colors(
+                                                    selectedColor = MaterialTheme.colorScheme.primary,
+                                                    unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            )
+
+                                            Spacer(modifier = Modifier.width(16.dp))
+
+                                            Column {
+                                                Text(
+                                                    text = "${convertTimeFormat(slot.startHHMM)} - ${convertTimeFormat(slot.endHHMM)}",
+                                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
+                                                    ),
+                                                    color = if (isSelected) {
+                                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                                    } else {
+                                                        MaterialTheme.colorScheme.onSurface
+                                                    }
+                                                )
+
+                                                // Optional: Add duration or additional info
+                                                Text(
+                                                    text = "Available",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = if (isSelected) {
+                                                        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                                                    } else {
+                                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                                    }
+                                                )
+                                            }
+
+                                            Spacer(modifier = Modifier.weight(1f))
+
+                                            // Optional: Add check icon for selected state
+                                            if (isSelected) {
+                                                Icon(
+                                                    imageVector = Icons.Default.CheckCircle,
+                                                    contentDescription = "Selected",
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.size(24.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+//                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Action buttons
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = {
+                                        scope.launch { sheetState.hide() }.invokeOnCompletion{
+                                            if(!sheetState.isVisible){
+                                                showBottomSheet=false
+                                            }
+                                        }
+
+                                        // Reset selection if needed
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.onSurface
+                                    ),
+                                    border = BorderStroke(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.outline
+                                    )
+                                ) {
+                                    Text(
+                                        text = "Cancel",
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
+
+                                Button(
+                                    onClick = {
+                                        // Handle confirm action
+                                        viewModel.updateSelectedTimeSlot(updatedSelectedTimeSlot)
+                                        scope.launch { sheetState.hide() }.invokeOnCompletion{
+                                            if(!sheetState.isVisible){
+                                                showBottomSheet=false
+                                            }
+                                        }
+
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = true,
+                                    elevation = ButtonDefaults.buttonElevation(
+                                        defaultElevation = 4.dp,
+                                        pressedElevation = 8.dp
+                                    )
+                                ) {
+                                    Text(
+                                        text = "Confirm",
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -353,7 +586,8 @@ fun CartItemCard(
                             modifier = Modifier.size(32.dp)
                         ) {
                             Box(
-                                modifier = Modifier.clip(CircleShape)
+                                modifier = Modifier
+                                    .clip(CircleShape)
                                     .size(50.dp)
                                     .background(color = Color(0xFFECF0F4))
 //                                .shadow(elevation = 2.dp, shape = CircleShape)
@@ -362,7 +596,8 @@ fun CartItemCard(
                                     imageVector = Icons.Outlined.Remove,
                                     contentDescription = "Decrease quantity",
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier
+                                        .size(16.dp)
                                         .align(Alignment.Center)
                                 )
                             }
@@ -384,7 +619,8 @@ fun CartItemCard(
                             modifier = Modifier.size(32.dp)
                         ) {
                             Box(
-                                modifier = Modifier.clip(CircleShape)
+                                modifier = Modifier
+                                    .clip(CircleShape)
                                     .size(50.dp)
                                     .background(color = Color(0xFFECF0F4))
 //                                .shadow(elevation = 2.dp, shape = CircleShape)
@@ -393,7 +629,8 @@ fun CartItemCard(
                                     imageVector = Icons.Default.Add,
                                     contentDescription = "Increase quantity",
                                     tint =  MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier
+                                        .size(16.dp)
                                         .align(Alignment.Center)
                                 )
                             }
@@ -407,7 +644,8 @@ fun CartItemCard(
             IconButton(onRemove,
                 modifier = Modifier.size(32.dp)) {
                 Box(
-                    modifier = Modifier.clip(CircleShape)
+                    modifier = Modifier
+                        .clip(CircleShape)
                         .size(40.dp)
                         .background(color = MaterialTheme.colorScheme.onErrorContainer)
 //                                .shadow(elevation = 2.dp, shape = CircleShape)
@@ -416,7 +654,8 @@ fun CartItemCard(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Remove item",
                         tint = MaterialTheme.colorScheme.onError,
-                        modifier = Modifier.padding(5.dp)
+                        modifier = Modifier
+                            .padding(5.dp)
                             .align(Alignment.Center)
                     )
                 }

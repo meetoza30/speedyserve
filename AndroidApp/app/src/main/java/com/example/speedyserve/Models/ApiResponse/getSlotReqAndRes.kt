@@ -15,12 +15,18 @@ data class dishslotReq(
 )
 
 data class getSlotRes(
-    val earliestPickupFormatted: String,
-    val availableSlots : List<Slots>
+    val earliestPickup : PickupTime,
+    val earilestPickupSlot : PickupTime,
+    val slots : List<Slot>
 )
-data class Slots(
-    val canteenId: String,
-    val startTime : String,
-    val endTime : String,
-    val maxOrders : Int
+data class Slot(
+    val startISO : String,
+    val endISO : String,
+    val startHHMM : String,
+    val endHHMM : String
+)
+
+data class PickupTime(
+    val iso : String,
+    val hhmm : String
 )
