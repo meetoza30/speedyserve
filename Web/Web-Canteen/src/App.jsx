@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Footer from './components/Footer/Footer'
 import Login from './components/Login/Login'
 import { useState } from 'react'
+import SpeedyServeLanding from './pages/Landing/Landing'
 
 const App = () => {
   const[showLogin,setShowLogin]=useState(false);
@@ -19,12 +20,12 @@ const App = () => {
     }
      <div className='app'>
       <ToastContainer />
-      <Navbar setShowLogin={setShowLogin}/>
+      {/* <Navbar setShowLogin={setShowLogin}/> */}
       <hr />
       <div className="app-content">
-        <Sidebar />
+        {/* <Sidebar /> */}
         <Routes>
-          <Route path='/' element={<Add />}/>
+          <Route path='/' element={<SpeedyServeLanding />}/>
           <Route path="/add" element={<Add />} />
           <Route path="/list" element={<List />} />
           <Route path="/orders" element={<Orders />} />

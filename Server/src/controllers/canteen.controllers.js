@@ -220,9 +220,6 @@ const getSlots = async (req, res) => {
   }
 };
 
-
-
-
 const registerCanteen = async (req, res)=>{
     try{
         const {name, password, emailId, mobile} = req.body;
