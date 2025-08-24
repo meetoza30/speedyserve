@@ -5,6 +5,9 @@ import com.example.speedyserve.API.Apis
 import com.example.speedyserve.Models.ApiResponse.ApiResponse
 import com.example.speedyserve.Models.ApiResponse.CheckAuthResponse
 import com.example.speedyserve.Models.ApiResponse.TokenReq
+import com.example.speedyserve.Models.ApiResponse.dishslotReq
+import com.example.speedyserve.Models.ApiResponse.getSlotReq
+import com.example.speedyserve.Models.ApiResponse.getSlotRes
 import com.example.speedyserve.Models.AuthModels.UserSignInReq
 import com.example.speedyserve.Models.AuthModels.UserSignUpReq
 import com.example.speedyserve.Models.Canteens.Canteen
@@ -14,6 +17,7 @@ import com.example.speedyserve.Models.Dishes.DishesResponse
 import com.example.speedyserve.Screen.MenuScreen.dishWithQuantity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import okhttp3.Response
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -105,7 +109,7 @@ class Repo @Inject constructor(private val apis: Apis)  {
                     val jsonObject = JSONObject(errorBody)
                     jsonObject.getString("message")
                 }catch (e : Exception){
-                    "Unknown Error }"
+                    "Unknown Error "
                 }
                 Result.failure(Exception("Fetching Dishes failed : $errorMessage"))
             }
@@ -137,4 +141,28 @@ class Repo @Inject constructor(private val apis: Apis)  {
         )
         Log.d("repo after sending cartorder",cartOrderGlobal.value!!.dishWithQuantity.value.toString())
     }
+    
+    suspend fun getSlots(getSlotReq: getSlotReq) : Result<getSlotRes>{
+        return try {
+            val response = apis.getTimeSlots(getSlotReq)
+            if(response.isSuccessful){
+                response.body()?.let {
+                    Result.success(it)
+                }?: Result.failure(Exception("Empty response body"))
+            }else{
+                val errorBody = response.errorBody()?.string()
+                Log.d("getslots", "Raw error body = ${errorBody}")
+                val errorMessage = try{
+                    val jsonObject = JSONObject(errorBody)
+                    jsonObject.optString("message")
+                }catch (e : Exception){
+                    "Unknown Error "
+                }
+                Result.failure(Exception("Fetching getslot failed : $errorMessage"))
+            }
+        }catch (e : Exception){
+            Result.failure(e)
+        }
+    }
+
 }

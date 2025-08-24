@@ -3,6 +3,8 @@ package com.example.speedyserve.API
 import com.example.speedyserve.Models.ApiResponse.ApiResponse
 import com.example.speedyserve.Models.ApiResponse.CheckAuthResponse
 import com.example.speedyserve.Models.ApiResponse.TokenReq
+import com.example.speedyserve.Models.ApiResponse.getSlotReq
+import com.example.speedyserve.Models.ApiResponse.getSlotRes
 import com.example.speedyserve.Models.AuthModels.UserSignInReq
 import com.example.speedyserve.Models.AuthModels.UserSignUpReq
 import com.example.speedyserve.Models.Canteens.Canteen
@@ -33,4 +35,7 @@ interface Apis {
 
     @POST("api/getCanteenDishes")
     suspend fun getCanteenDishes(@Body canteenId : DishesReq) : Response<DishesResponse>
+
+    @POST("api/getSlots")
+    suspend fun getTimeSlots(@Body slotreq : getSlotReq) : Response<getSlotRes>
 }
