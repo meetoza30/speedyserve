@@ -8,9 +8,11 @@ import Orders from './pages/Orders/Orders'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Footer from './components/Footer/Footer'
-import Login from './components/Login/Login'
+// import Login from './components/Login/Login'
 import { useState } from 'react'
 import SpeedyServeLanding from './pages/Landing/Landing'
+import Signup from './pages/Login/Signup'
+import Login from './pages/Login/Login'
 
 const App = () => {
   const[showLogin,setShowLogin]=useState(false);
@@ -26,6 +28,8 @@ const App = () => {
         {/* <Sidebar /> */}
         <Routes>
           <Route path='/' element={<SpeedyServeLanding />}/>
+          <Route path='/login' element={<Login />}/>
+          <Route path='/signup' element={<Signup />}/>
           <Route path="/add" element={<Add />} />
           <Route path="/list" element={<List />} />
           <Route path="/orders" element={<Orders />} />
