@@ -103,7 +103,7 @@ const getUserInfo = async(req,res,next) =>{
 
     try{
         const decodedId = await jwt.verify(token,process.env.SPEEDY_SERVE_KEY)
-        const user = await User.findById(decodedId)
+        const user = await User.findById(decodedId).select("username email mobile")
 
         if(!user){
             res.status(401).json({success : false, message : "User does not exist"})
@@ -112,7 +112,7 @@ const getUserInfo = async(req,res,next) =>{
         res.status(200).json({
             success : true,
             message : "Fetched SuccessFully",
-            user : user.select("username email mobile")
+            user : user
         })
     }catch(err){
         console.error(err)
