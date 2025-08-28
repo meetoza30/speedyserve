@@ -5,6 +5,8 @@ import com.example.speedyserve.API.Apis
 import com.example.speedyserve.Models.ApiResponse.ApiResponse
 import com.example.speedyserve.Models.ApiResponse.CheckAuthResponse
 import com.example.speedyserve.Models.ApiResponse.TokenReq
+import com.example.speedyserve.Models.ApiResponse.UserInfo
+import com.example.speedyserve.Models.ApiResponse.UserInfoRes
 import com.example.speedyserve.Models.ApiResponse.dishslotReq
 import com.example.speedyserve.Models.ApiResponse.getSlotReq
 import com.example.speedyserve.Models.ApiResponse.getSlotRes
@@ -73,6 +75,46 @@ class Repo @Inject constructor(private val apis: Apis)  {
         }
     }
 
+    suspend fun getUserInfo(token: String) : Result<UserInfoRes>{
+        return try {
+            val tokenReq = TokenReq(token)
+            val response = apis.getUserInfo(tokenReq)
+            if (response.isSuccessful){
+                response.body()?.let {
+                    Result.success(it)
+                }?: Result.failure(Exception("Empty Response Body"))
+            }else{
+                val errorBody = response.errorBody()?.string()
+                val errorMessage = try {
+                    val jsonObject = JSONObject(errorBody)
+                    jsonObject.getString("message")
+                }catch (e : Exception){
+                    "Unknown Error"
+                }
+                Result.failure(Exception(errorMessage))
+            }
+        }catch (e : Exception){
+            Result.failure(e)
+        }
+    }
+
+    suspend fun checkAuthentication(token: String) : Result<CheckAuthResponse>{
+        return try {
+            val tokenReq = TokenReq(token)
+            val response = apis.checkAuth(tokenReq)
+            if(response.isSuccessful){
+                response.body()?.let {
+                    Result.success(it)
+                }?: Result.failure(Exception("Empty Response Body"))
+            }else{
+                Result.failure(Exception("error in authentication"))
+            }
+        }catch (e : Exception){
+            Result.failure(e)
+        }
+    }
+
+
     suspend fun getCanteenList() : Result<CanteenResponse>{
         return try {
             val response = apis.getCanteens()
@@ -118,21 +160,7 @@ class Repo @Inject constructor(private val apis: Apis)  {
         }
     }
 
-    suspend fun checkAuthentication(token: String) : Result<CheckAuthResponse>{
-        return try {
-            val tokenReq = TokenReq(token)
-            val response = apis.checkAuth(tokenReq)
-            if(response.isSuccessful){
-                response.body()?.let {
-                    Result.success(it)
-                }?: Result.failure(Exception("Empty Response Body"))
-            }else{
-                Result.failure(Exception("error in authentication"))
-            }
-        }catch (e : Exception){
-            Result.failure(e)
-        }
-    }
+
 
     fun saveCartOrder(cartOrder : MutableStateFlow<List<dishWithQuantity>>,canteenId: String){
         _cartOrderGlobal.value = CartOrder(

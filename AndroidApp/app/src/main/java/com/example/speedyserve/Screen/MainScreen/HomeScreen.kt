@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.speedyserve.Models.Canteens.Canteen
 import com.example.speedyserve.Screen.MainScreen.HomeScreenVM
 import com.example.speedyserve.ui.theme.SpeedyServeTheme
@@ -46,14 +47,6 @@ data class Category(
     var isSelected: Boolean = false
 )
 
-data class Restaurant(
-    val name: String,
-    val cuisine: String,
-    val rating: Float,
-    val deliveryTime: String,
-    val deliveryFee: String,
-    val imageRes: Int? = null
-)
 
 //@Preview(showSystemUi = true)
 //@Composable
@@ -67,6 +60,7 @@ data class Restaurant(
 @Composable
 fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
     val canteenList by HomeScreenVM.canteenList.collectAsState()
+    val user by HomeScreenVM.user.collectAsState()
     val isLoading by HomeScreenVM.isLoading.collectAsState()
     val context = LocalContext.current
 
@@ -74,32 +68,17 @@ fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
         HomeScreenVM.fetchCanteens(){
             Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
         }
+        HomeScreenVM.getUserInfo(context)
 
     }
 
     val categories = listOf(
         Category("All", Icons.Default.LocalFireDepartment, true),
-        Category("Hot Dog", Icons.Default.Fastfood),
-        Category("Burger", Icons.Default.LunchDining),
-        Category("Pizza", Icons.Default.LocalPizza)
+//        Category("Hot Dog", Icons.Default.Fastfood),
+//        Category("Burger", Icons.Default.LunchDining),
+//        Category("Pizza", Icons.Default.LocalPizza)
     )
 
-    val restaurants = listOf(
-        Restaurant(
-            name = "Rose Garden Restaurant",
-            cuisine = "Burger • Chicken • Riche • Wings",
-            rating = 4.7f,
-            deliveryTime = "20 min",
-            deliveryFee = "Free"
-        ),
-        Restaurant(
-            name = "Green Bowl Kitchen",
-            cuisine = "Healthy • Salads • Bowls • Vegan",
-            rating = 4.5f,
-            deliveryTime = "25 min",
-            deliveryFee = "₹30"
-        )
-    )
 
         Column(
             modifier = Modifier
@@ -125,7 +104,7 @@ fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Halol Lab office",
+                                text = user?.username?:"Guest",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.W400
                             )
@@ -184,7 +163,7 @@ fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
             Row {
                 Text(
-                    text = "Hey Halal, ",
+                    text =  "hey ,${user?.username ?: "Guest"}",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(start = 16.dp)
@@ -405,23 +384,23 @@ fun RestaurantCard(restaurant: Canteen,
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Rating
-//                    Row(
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Default.Star,
-//                            contentDescription = "Rating",
-//                            tint = Color(0xFFFF9800),
-//                            modifier = Modifier.size(16.dp)
-//                        )
-//                        Text(
-//                            text = restaurant.rating.toString(),
-//                            style = MaterialTheme.typography.bodySmall,
-//                            fontWeight = FontWeight.Medium
-//                        )
-//                    }
+//                     Rating
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Rating",
+                            tint = Color(0xFFFF9800),
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = restaurant.rating.toString(),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
 
                 }
             }

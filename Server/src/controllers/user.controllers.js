@@ -94,4 +94,28 @@ const getPastOrders = async (req,res)=>{
     res.json({pastOrders : orders})
 }
 
-export { registerUser, loginUser };
+const getUserInfo = async(req,res,next) =>{
+    const token = req.body.token
+
+    if(!token){
+       return res.status(401).json({success : false,message : "Access Denied. No token Provided"})
+    }
+
+    try{
+        const decodedId = await jwt.verify(token,process.env.SPEEDY_SERVE_KEY)
+        const user = await User.findById(decodedId)
+
+        if(!user){
+            res.status(401).json({success : false, message : "User does not exist"})
+        } 
+
+        res.status(200).json({
+            success : true,
+            message : "Fetched SuccessFully",
+            user : user.select("username email mobile")
+        })
+    }catch(err){
+        res.error(err)
+    }
+}
+export { registerUser, loginUser ,getUserInfo};

@@ -204,7 +204,7 @@ fun MenuScreen(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "Maurcenas sed elem eget risus vastib blandit sit amet non magna. Integer posiaere erat a ante venenatis dapibus posuere velit attibeal.",
+                        text = canteen.short_descripiton,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 3,
@@ -231,7 +231,7 @@ fun MenuScreen(
                                 modifier = Modifier.size(16.dp)
                             )
                             Text(
-                                text = "4.7",
+                                text = canteen.rating.toString(),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     fontWeight = FontWeight.Medium
                                 ),

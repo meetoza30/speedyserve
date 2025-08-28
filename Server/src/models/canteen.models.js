@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+// import { string } from "joi";
 
 
 const canteenSchema = new mongoose.Schema({
@@ -21,7 +22,15 @@ const canteenSchema = new mongoose.Schema({
         type: String,
         required:true
     },
-    
+    image:{
+        type: String
+    },
+    short_descripiton:{
+        type : String
+    },
+    rating : {
+        type : mongoose.SchemaTypes.Double
+    },
     openingTime: {
         type: String,  
     },
@@ -33,7 +42,7 @@ const canteenSchema = new mongoose.Schema({
    slots: [{ type: mongoose.Schema.Types.ObjectId, ref: "Slot" }]
 }, { timestamps: true });
 
-//rating, image, short description,  
+//rating, image, short description 
 
 canteenSchema.methods.getJWToken = async function(){
     const canteen = this;

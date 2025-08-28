@@ -3,6 +3,8 @@ package com.example.speedyserve.API
 import com.example.speedyserve.Models.ApiResponse.ApiResponse
 import com.example.speedyserve.Models.ApiResponse.CheckAuthResponse
 import com.example.speedyserve.Models.ApiResponse.TokenReq
+import com.example.speedyserve.Models.ApiResponse.UserInfo
+import com.example.speedyserve.Models.ApiResponse.UserInfoRes
 import com.example.speedyserve.Models.ApiResponse.getSlotReq
 import com.example.speedyserve.Models.ApiResponse.getSlotRes
 import com.example.speedyserve.Models.AuthModels.UserSignInReq
@@ -28,6 +30,9 @@ interface Apis {
 
     @POST("api/check-auth")
     suspend fun checkAuth(@Body token: TokenReq) : Response<CheckAuthResponse>
+
+    @POST("/api/getUserInfo")
+    suspend fun getUserInfo(@Body token: TokenReq) : Response<UserInfoRes>
 
     //canteenApis
     @GET("api/getCanteens")

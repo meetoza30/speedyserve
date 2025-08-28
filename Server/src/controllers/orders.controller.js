@@ -32,21 +32,21 @@ const getPendingOrders = async (req,res)=>{
  
  const placeOrder = async (req, res) => {
     try {
-        const { dishes, timeSlot, canteenId, totalPrice} = req.body;
+        const { dishes, timeSlot, canteenId, totalPrice, preptime, userId} = req.body;
 
         const canteen = await Canteen.findById(canteenId);
         if (!canteen) {
             return res.status(404).json({ error: "Canteen not found" });
         }
 
-        let totalPrepTime = 0;
+      
 
         // Find the time slot in the canteen's available slots
         // const slot = canteen.slots.find(slot => slot.time === timeSlot);
         // if (!slot) {
         //     return res.status(400).json({ error: "Invalid time slot" });
         // }
-        const slot = timeSlot
+     
 
         // Calculate total preparation time
         // for (let dish of dishes) {
@@ -63,15 +63,16 @@ const getPendingOrders = async (req,res)=>{
 
         // Create a new order
         const order = new Order({
+            userId,
             timeSlot,
             dishes,
             totalPrice,
             canteenId,
-            status: "pending" // Default status when order is placed
+            status: "in queue",
+            preptime // Default status when order is placed
         });
 
         await order.save();
-        await canteen.save(); // Save updated canteen slot info
 
         res.status(200).json({ message: "Order placed successfully", order });
 
