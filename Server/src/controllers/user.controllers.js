@@ -115,7 +115,8 @@ const getUserInfo = async(req,res,next) =>{
             user : user.select("username email mobile")
         })
     }catch(err){
-        res.error(err)
+        console.error(err)
+        res.status(500).json({success : false, message: "Internal server error" });
     }
 }
 export { registerUser, loginUser ,getUserInfo};
