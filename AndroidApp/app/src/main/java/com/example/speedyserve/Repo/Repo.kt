@@ -10,12 +10,14 @@ import com.example.speedyserve.Models.ApiResponse.UserInfoRes
 import com.example.speedyserve.Models.ApiResponse.dishslotReq
 import com.example.speedyserve.Models.ApiResponse.getSlotReq
 import com.example.speedyserve.Models.ApiResponse.getSlotRes
+import com.example.speedyserve.Models.ApiResponse.placeOrderResponse
 import com.example.speedyserve.Models.AuthModels.UserSignInReq
 import com.example.speedyserve.Models.AuthModels.UserSignUpReq
 import com.example.speedyserve.Models.Canteens.Canteen
 import com.example.speedyserve.Models.Canteens.CanteenResponse
 import com.example.speedyserve.Models.Dishes.DishesReq
 import com.example.speedyserve.Models.Dishes.DishesResponse
+import com.example.speedyserve.Models.Order
 import com.example.speedyserve.Screen.MenuScreen.dishWithQuantity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -188,6 +190,29 @@ class Repo @Inject constructor(private val apis: Apis)  {
                 }
                 Result.failure(Exception("Fetching getslot failed : $errorMessage"))
             }
+        }catch (e : Exception){
+            Result.failure(e)
+        }
+    }
+
+    suspend fun placeOrder(order: Order) : Result<placeOrderResponse>{
+        return  try {
+            val response = apis.placeOrder(order)
+            if(response.isSuccessful){
+                response.body()?.let {
+                    Result.success(it)
+                }?: Result.failure(Exception("Empty response body"))
+            }else{
+                val errorBody = response.errorBody()?.string()//body of error response
+                val errormessage = try {
+                    val jsonObject = JSONObject(errorBody)//converting to jsonobject
+                    jsonObject.optString("error")//finding message from messagebody
+                }catch (e : Exception){
+                    "Unknown Error"
+                }
+                Result.failure(Exception(errormessage))
+            }
+
         }catch (e : Exception){
             Result.failure(e)
         }

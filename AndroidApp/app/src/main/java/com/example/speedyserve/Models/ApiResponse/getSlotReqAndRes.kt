@@ -20,9 +20,9 @@ data class getSlotRes(
     val slots : List<Slot>
 )
 data class Slot(
-    val startISO : String,
-    val endISO : String,
-    val startHHMM : String,
+    val startISO : String ,
+    val endISO : String ,
+    val startHHMM : String ,
     val endHHMM : String
 )
 

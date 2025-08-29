@@ -147,7 +147,7 @@ fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "H",
+                            text = user?.username?.get(0)?.uppercase()?:"G",
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
@@ -163,7 +163,7 @@ fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
             Row {
                 Text(
-                    text =  "hey ,${user?.username ?: "Guest"}",
+                    text =  "hey ,${user?.username ?: "Guest"} ",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(start = 16.dp)

@@ -473,7 +473,11 @@ fun CartScreen(
 
                 // Place Order Button
                 Button(
-                    onClick = onPlaceOrder,
+                    onClick = {viewModel.placeOrder(context, onError = {
+                        Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
+                    }, onSuccess = {
+                        Toast.makeText(context,it,Toast.LENGTH_SHORT).show()
+                    })},
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

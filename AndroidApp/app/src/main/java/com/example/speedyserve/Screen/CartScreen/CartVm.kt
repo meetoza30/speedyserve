@@ -1,5 +1,6 @@
 package com.example.speedyserve.Screen.CartScreen
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -10,20 +11,26 @@ import com.example.speedyserve.Models.ApiResponse.Slot
 import com.example.speedyserve.Models.ApiResponse.dishslotReq
 import com.example.speedyserve.Models.ApiResponse.getSlotReq
 import com.example.speedyserve.Models.Order
+import com.example.speedyserve.Models.orderDishes
 import com.example.speedyserve.Repo.CartOrder
 import com.example.speedyserve.Repo.Repo
+import com.example.speedyserve.Screen.AuthScreens.LoginScreen
 import com.example.speedyserve.Screen.MenuScreen.dishWithQuantity
+import com.example.speedyserve.utils.TokenManager
+import com.example.speedyserve.utils.extractUserIdFromJWT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
 class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
 
-    private val _order : MutableStateFlow<Order?> = MutableStateFlow(null)
-    val order : StateFlow<Order?> = _order
+
 
     private val _cartDishes : MutableStateFlow<List<dishWithQuantity>> = MutableStateFlow(emptyList())
     val cartDishes : StateFlow<List<dishWithQuantity>> = _cartDishes
@@ -135,5 +142,46 @@ class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
 
     fun updateSelectedTimeSlot(slot : Slot){
         _selectedSlot.value = slot
+    }
+
+    fun placeOrder(context : Context, onError: (String) -> Unit, onSuccess : (String)-> Unit){
+
+        //extracting userId
+        val token = TokenManager(context).getToken()
+        var userId : String? = null
+        if(token!=null){
+            userId = extractUserIdFromJWT(token)
+            Log.d("order",userId.toString())
+        }
+
+
+        val dishes = cartDishes.value.map {
+            orderDishes(
+                dish = it.dish,
+                quantity = it.quantity,
+                price = it.dish.price.toInt()
+            )
+        }
+        val timeslot = Json.encodeToString(selectedSlot.value)
+
+        val order = Order(
+            userId = userId?:"",
+            canteenId = _canteenId.value?:"",
+            dishes = dishes,
+            timeSlot = timeslot,
+            totalPrice = 0,
+            preptime = 0
+
+        )
+        Log.d("order",order.toString())
+        viewModelScope.launch {
+            repo.placeOrder(order)
+                .onSuccess {
+                    onSuccess(it.message)
+                }
+                .onFailure {
+                    onError(it.message.toString())
+                }
+        }
     }
 }

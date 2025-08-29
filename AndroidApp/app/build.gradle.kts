@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.example.speedyserve"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.speedyserve"
@@ -57,24 +57,26 @@ dependencies {
     // ✅ ViewModel + Hilt (DI)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
     implementation("androidx.hilt:hilt-navigation-compose")
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-compiler:2.51.1")
+    implementation("com.google.dagger:hilt-android:2.57.1")
+    kapt("com.google.dagger:hilt-compiler:2.57.1")
 
     // ✅ Retrofit for Networking
-    implementation("com.squareup.retrofit2:retrofit:2.10.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.10.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11")
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.1.0")
 
     // ✅ Jetpack Navigation Compose
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation("androidx.navigation:navigation-compose:2.9.3")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 
     // ✅ Optional Tools
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("io.coil-kt:coil-compose:2.5.0")
-    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
-    implementation ("com.auth0.android:jwtdecode:2.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
+    implementation ("com.auth0.android:jwtdecode:2.0.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+
 
 
     implementation(libs.androidx.core.ktx)

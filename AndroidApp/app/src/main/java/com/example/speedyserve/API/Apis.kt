@@ -7,12 +7,14 @@ import com.example.speedyserve.Models.ApiResponse.UserInfo
 import com.example.speedyserve.Models.ApiResponse.UserInfoRes
 import com.example.speedyserve.Models.ApiResponse.getSlotReq
 import com.example.speedyserve.Models.ApiResponse.getSlotRes
+import com.example.speedyserve.Models.ApiResponse.placeOrderResponse
 import com.example.speedyserve.Models.AuthModels.UserSignInReq
 import com.example.speedyserve.Models.AuthModels.UserSignUpReq
 import com.example.speedyserve.Models.Canteens.Canteen
 import com.example.speedyserve.Models.Canteens.CanteenResponse
 import com.example.speedyserve.Models.Dishes.DishesReq
 import com.example.speedyserve.Models.Dishes.DishesResponse
+import com.example.speedyserve.Models.Order
 import com.example.speedyserve.Models.Token.Token
 import retrofit2.Response
 import retrofit2.http.Body
@@ -43,4 +45,9 @@ interface Apis {
 
     @POST("api/getSlots")
     suspend fun getTimeSlots(@Body slotreq : getSlotReq) : Response<getSlotRes>
+
+    @POST("/orders/placeOrder")
+    suspend fun placeOrder(@Body order : Order) : Response<placeOrderResponse>
+
+
 }
