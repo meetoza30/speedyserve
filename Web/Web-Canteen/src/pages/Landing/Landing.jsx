@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Navbar from '../../components/Navbar/Navbar';
 import { ChevronDownIcon, PlayIcon } from '@heroicons/react/24/outline';
 
 const SpeedyServeLanding = () => {
@@ -11,27 +12,7 @@ const SpeedyServeLanding = () => {
   return (
     <div className="min-h-screen bg-white font-inter">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <div className="bg-orange-500 rounded-lg p-2">
-                <span className="text-white font-bold text-xl">SS</span>
-              </div>
-              <span className="ml-3 text-xl font-bold text-gray-900">SpeedyServe</span>
-            </div>
-            <div className="hidden md:flex space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-orange-500 transition-colors">Features</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-orange-500 transition-colors">How It Works</a>
-              <a href="#canteen" className="text-gray-600 hover:text-orange-500 transition-colors">For Canteens</a>
-              <a href="#download" className="text-gray-600 hover:text-orange-500 transition-colors">Download</a>
-            </div>
-            <button className="bg-orange-500 text-white px-6 py-2 rounded-full hover:bg-orange-600 transition-all duration-300 hover:scale-105">
-              Login
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
@@ -79,9 +60,9 @@ const SpeedyServeLanding = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Pickup Time</span>
                         <select className="border border-gray-200 rounded-lg px-3 py-1">
-                          <option>12:30 PM</option>
-                          <option>1:00 PM</option>
-                          <option>1:30 PM</option>
+                          <option>12:30 - 12:45 PM</option>
+                          <option>1:00 - 1:15 PM</option>
+                          <option>1:30 - 1:45 PM</option>
                         </select>
                       </div>
                     </div>

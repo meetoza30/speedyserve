@@ -71,10 +71,15 @@ const Signup = () => {
         body: JSON.stringify(formData)
       });
 
+       
+
       const data = await response.json();
 
       if (response.ok) {
         setSuccess('Account created successfully! Redirecting to login...');
+        console.log(data.canteenId, data.message);
+          localStorage.setItem('canteenId', data.canteenId); // Store canteenId
+          localStorage.setItem('token', data.token);         
         // Clear form
         setFormData({
           name: '',
@@ -82,10 +87,13 @@ const Signup = () => {
           mobile: '',
           password: ''
         });
-        // Redirect to login page
-        setTimeout(() => {
-          window.location.href = '/login'; // or use React Router navigation
-        }, 2000);
+
+       
+        // localStorage.setItem("response", response);
+        // // Redirect to login page
+        // setTimeout(() => {
+        //   window.location.href = '/login'; // or use React Router navigation
+        // }, 2000);
       } else {
         setError(data.message || 'Registration failed. Please try again.');
       }
@@ -133,7 +141,7 @@ const Signup = () => {
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name
+                Canteen/Mess Name
               </label>
               <div className="mt-1">
                 <input
@@ -224,26 +232,7 @@ const Signup = () => {
               </p>
             </div>
 
-            {/* Terms and Conditions */}
-            <div className="flex items-center">
-              <input
-                id="terms"
-                name="terms"
-                type="checkbox"
-                required
-                className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-              />
-              <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-                I agree to the{' '}
-                <a href="#" className="text-orange-600 hover:text-orange-500">
-                  Terms and Conditions
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-orange-600 hover:text-orange-500">
-                  Privacy Policy
-                </a>
-              </label>
-            </div>
+            
 
             {/* Submit Button */}
             <div>

@@ -46,7 +46,7 @@ const Login = () => {
         localStorage.setItem('user', JSON.stringify(data.user));
         // Redirect or update app state
         setTimeout(() => {
-          window.location.href = '/add'; // or use React Router navigation
+          window.location.href = '/dashboard'; // or use React Router navigation
         }, 1500);
       } else {
         setError(data.message || 'Login failed. Please try again.');

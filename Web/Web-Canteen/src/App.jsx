@@ -13,6 +13,8 @@ import { useState } from 'react'
 import SpeedyServeLanding from './pages/Landing/Landing'
 import Signup from './pages/Login/Signup'
 import Login from './pages/Login/Login'
+import CanteenDashboard from './pages/Dashboard/Dashboard'
+import ManageMenu from './pages/Add/Add'
 
 const App = () => {
   const[showLogin,setShowLogin]=useState(false);
@@ -30,8 +32,8 @@ const App = () => {
           <Route path='/' element={<SpeedyServeLanding />}/>
           <Route path='/login' element={<Login />}/>
           <Route path='/signup' element={<Signup />}/>
-          <Route path="/add" element={<Add />} />
-          <Route path="/list" element={<List />} />
+          <Route path="/manage-menu" element={<ManageMenu />} />
+          <Route path="/dashboard" element={<CanteenDashboard />} />
           <Route path="/orders" element={<Orders />} />
         </Routes>
         
