@@ -79,19 +79,30 @@ const loginUser = async (req, res) => {
     }
 };
 
-const getUserOrderDetails = async(req,res)=>{
-   try {
-    const order = await Order.findById(req._id);
-    res.json(order);
-}
-catch(err){
-    res.error(err)
-}
+const getUserInfo = async(req,res,next) =>{
+    const token = req.body.token
+
+    if(!token){
+       return res.status(401).json({success : false,message : "Access Denied. No token Provided"})
+    }
+
+    try{
+        const decodedId = await jwt.verify(token,process.env.SPEEDY_SERVE_KEY)
+        const user = await User.findById(decodedId).select("username email mobile")
+
+        if(!user){
+            res.status(401).json({success : false, message : "User does not exist"})
+        } 
+
+        res.status(200).json({
+            success : true,
+            message : "Fetched SuccessFully",
+            user : user
+        })
+    }catch(err){
+        console.error(err)
+        res.status(500).json({success : false, message: "Internal server error" });
+    }
 }
 
-const getPastOrders = async (req,res)=>{
-    const orders = await Order.find({userId : req._id});
-    res.json({pastOrders : orders})
-}
-
-export { registerUser, loginUser };
+export { registerUser, loginUser, getUserInfo};

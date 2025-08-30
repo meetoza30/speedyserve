@@ -223,6 +223,7 @@ const getSlots = async (req, res) => {
 const registerCanteen = async (req, res)=>{
     try{
         const {name, password, emailId, mobile} = req.body;
+        console.log(req.body)
 
                 if (!name || !emailId || !password || !mobile) {
                     return res.status(400).json({ message: "All fields are required" });
@@ -238,14 +239,14 @@ const registerCanteen = async (req, res)=>{
                         const newCanteen = new Canteen({ name, emailId, password: hashedPassword, mobile });
                         const token = await newCanteen.getJWToken();
                         console.log(token)
-                        await newCanteen.save();
+                        const canteen = await newCanteen.save();
                         res.cookie("token", token, {
                             path : '/',
                             httpOnly: true,
                             secure: process.env.NODE_ENV === "production",
                             sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
                         })
-                        res.status(201).json({ message: "Canteen registered successfully", token : token});
+                        res.status(201).json({ message: "Canteen registered successfully", token : token, canteenId : canteen._id});
     }
     catch(err){
         console.log(err)
@@ -334,8 +335,10 @@ catch(err){
 }
 }
 
+
 const addDish = async (req, res) => {
     const { canteenId, name, description, price, category, serveTime} = req.body;
+    console.log( canteenId, name, description, price, category, serveTime)
 
     try {
         const image_url = req?.file?.path; 
@@ -362,6 +365,124 @@ const addDish = async (req, res) => {
     }
 };
 
+const updateDish = async(req, res) => {
+    try {
+        console.log('=== UPDATE DISH REQUEST ===');
+        console.log('Body:', req.body);
+        console.log('File:', req.file);
+        console.log('Headers:', req.headers);
+
+        const { canteenId, dishId } = req.body;
+        
+        // Validate required fields
+        if (!canteenId) {
+            return res.status(400).json({
+                success: false,
+                message: "canteenId is required"
+            });
+        }
+        
+        if (!dishId) {
+            return res.status(400).json({
+                success: false,
+                message: "dishId is required"
+            });
+        }
+
+        let updateData = {};
+        
+        // Handle FormData request (with potential image upload)
+        if (req.file) {
+            console.log('Processing FormData request with image');
+            updateData = {
+                name: req.body.name,
+                description: req.body.description,
+                price: Number(req.body.price),
+                category: req.body.category,
+                serveTime: Number(req.body.serveTime),
+                image: req.file.path
+            };
+        } 
+        // Handle JSON request (without image)
+        else if (req.body.data) {
+            console.log('Processing JSON request without image');
+            updateData = {
+                name: req.body.data.name,
+                description: req.body.data.description,
+                price: Number(req.body.data.price),
+                category: req.body.data.category,
+                serveTime: Number(req.body.data.serveTime)
+            };
+        } 
+        // Handle direct field access (fallback)
+        else {
+            console.log('Processing direct field request');
+            updateData = {
+                name: req.body.name,
+                description: req.body.description,
+                price: Number(req.body.price),
+                category: req.body.category,
+                serveTime: Number(req.body.serveTime)
+            };
+        }
+
+        console.log('Update data prepared:', updateData);
+
+        // Validate ObjectId format
+        if (!mongoose.Types.ObjectId.isValid(dishId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid dishId format"
+            });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(canteenId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid canteenId format"
+            });
+        }
+
+        // Perform the update
+        const dish = await Dish.findOneAndUpdate(
+            { _id: dishId, canteenId },
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!dish) {
+            return res.status(404).json({
+                success: false,
+                message: "Dish not found or doesn't belong to this canteen"
+            });
+        }
+
+        console.log('Dish updated successfully:', dish._id);
+
+        res.json({
+            success: true,
+            message: "Dish Updated",
+            dish
+        });
+
+    } catch(err) {
+        console.error('=== UPDATE DISH ERROR ===');
+        console.error('Error name:', err.name);
+        console.error('Error message:', err.message);
+        console.error('Error stack:', err.stack);
+        
+        res.status(500).json({
+            success: false,
+            message: `Database error: ${err.message}`,
+            ...(process.env.NODE_ENV === 'development' && { 
+                error: err.name,
+                details: err.message 
+            })
+        });
+    }
+};
+
+
 const extractPublicIdFromUrl = (url) => {
     const parts = url.split('/');
     const fileName = parts[parts.length - 1];
@@ -383,5 +504,129 @@ const removeDish = async (req, res) => {
         res.json({ success: false, message: "Error removing dish" });
     }};
 
+// canteen dashboard routes
+const getDashboardOverview = async (req, res) => {
+   
+    try {
+       
+      //  console.log(req.body.canteenId)
+   console.log(req.params);
+  //  console.log(req)
 
-export {registerCanteen, loginCanteen, updateCanteen, getCanteens, getCanteensWithDishes, addDish, removeDish, getSlots} ;
+    const { canteenId } = req.params;
+        
+        // if (!mongoose.Types.ObjectId.isValid(canteenId)) {
+        //     return res.status(400).json({ error: "Invalid canteenId" });
+        // }
+
+        const today = new Date();
+        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+        // Get today's stats
+        const [todayOrders, todayRevenue, activeOrders, popularDish] = await Promise.all([
+            // Today's total orders
+            Order.countDocuments({
+                canteenId: new mongoose.Types.ObjectId(canteenId),
+                createdAt: { $gte: startOfDay, $lt: endOfDay }
+            }),
+
+            // Today's revenue
+            Order.aggregate([
+                {
+                    $match: {
+                        canteenId: new mongoose.Types.ObjectId(canteenId),
+                        createdAt: { $gte: startOfDay, $lt: endOfDay },
+                        status: { $ne: "cancelled" }
+                    }
+                },
+                { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+            ]),
+
+            // Active orders (in queue + preparing)
+            Order.countDocuments({
+                canteenId: new mongoose.Types.ObjectId(canteenId),
+                status: { $in: ["in queue", "preparing"] }
+            }),
+
+            // Most popular dish today
+            Order.aggregate([
+                {
+                    $match: {
+                        canteenId: new mongoose.Types.ObjectId(canteenId),
+                        createdAt: { $gte: startOfDay, $lt: endOfDay },
+                        status: { $ne: "cancelled" }
+                    }
+                },
+                { $unwind: "$dishes" },
+                {
+                    $lookup: {
+                        from: "dishes",
+                        localField: "dishes.dish",
+                        foreignField: "_id",
+                        as: "dishInfo"
+                    }
+                },
+                { $unwind: "$dishInfo" },
+                {
+                    $group: {
+                        _id: "$dishes.dish",
+                        name: { $first: "$dishInfo.name" },
+                        count: { $sum: "$dishes.quantity" }
+                    }
+                },
+                { $sort: { count: -1 } },
+                { $limit: 1 }
+            ])
+        ]);
+
+        const response = {
+            todayOrders,
+            todayRevenue: todayRevenue[0]?.total || 0,
+            activeOrders,
+            popularItem: popularDish[0] || { name: "No orders yet", count: 0 }
+        };
+
+        res.status(200).json({ success: true, data: response });
+    } catch (error) {
+        console.error("Dashboard overview error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+const getWeeklyRevenue = async (req, res) => {
+    try {
+        const { canteenId } = req.params;
+        
+        const today = new Date();
+        const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+        const weeklyData = await Order.aggregate([
+            {
+                $match: {
+                    canteenId: new mongoose.Types.ObjectId(canteenId),
+                    createdAt: { $gte: sevenDaysAgo },
+                    status: { $ne: "cancelled" }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                    },
+                    revenue: { $sum: "$totalPrice" },
+                    orders: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        res.status(200).json({ success: true, data: weeklyData });
+    } catch (error) {
+        console.error("Weekly revenue error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+
+export {registerCanteen, loginCanteen, updateCanteen, getCanteens, getCanteensWithDishes, addDish, updateDish, removeDish, getSlots, getDashboardOverview, getWeeklyRevenue} ;

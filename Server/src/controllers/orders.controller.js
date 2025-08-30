@@ -1,5 +1,6 @@
 import { Canteen } from "../models/canteen.models.js";
 import { Order } from "../models/order.models.js";
+import mongoose from "mongoose";
 
 
 const getPendingOrders = async (req,res)=>{
@@ -32,7 +33,7 @@ const getPendingOrders = async (req,res)=>{
  
  const placeOrder = async (req, res) => {
     try {
-        const { dishes, timeSlot, canteenId, totalPrice} = req.body;
+        const { dishes, timeSlot, canteenId, totalPrice, prepTime, userId} = req.body;
 
         const canteen = await Canteen.findById(canteenId);
         if (!canteen) {
@@ -67,7 +68,8 @@ const getPendingOrders = async (req,res)=>{
             dishes,
             totalPrice,
             canteenId,
-            status: "pending" // Default status when order is placed
+            userId,
+            status: "in queue" // Default status when order is placed
         });
 
         await order.save();
@@ -135,4 +137,58 @@ const getStausOfOrder = async(req,res)=>{
     }
 }
 
-export {addItemInOrder, getPendingOrders, updateOrderStatus, placeOrder}
+const getCurrentOrders = async (req, res) => {
+    try {
+        const { canteenId } = req.params;
+
+        const currentOrders = await Order.find({
+            canteenId: new mongoose.Types.ObjectId(canteenId),
+            status: { $in: ["in queue", "preparing"] }
+        })
+        .populate({
+            path: 'dishes.dish',
+            select: 'name price'
+        })
+        .populate('userId', 'username')
+        .sort({ createdAt: 1 })
+        .limit(10);
+
+        res.status(200).json({ success: true, data: currentOrders });
+    } catch (error) {
+        console.error("Current orders error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+const getTodayOrderTimeline = async (req, res) => {
+    try {
+        const { canteenId } = req.params;
+        
+        const today = new Date();
+        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+        const hourlyData = await Order.aggregate([
+            {
+                $match: {
+                    canteenId: new mongoose.Types.ObjectId(canteenId),
+                    createdAt: { $gte: startOfDay, $lt: endOfDay }
+                }
+            },
+            {
+                $group: {
+                    _id: { $hour: "$createdAt" },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        res.status(200).json({ success: true, data: hourlyData });
+    } catch (error) {
+        console.error("Timeline error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+export {addItemInOrder, getPendingOrders, updateOrderStatus, placeOrder, getCurrentOrders, getTodayOrderTimeline}

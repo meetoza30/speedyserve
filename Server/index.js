@@ -16,14 +16,9 @@ app.use(cors());
 app.use(cookieParser()); 
 
 connectDB();
-
-
-
 app.use("/api",userRouter);
-// app.use("/api/food",foodRouter);
 app.use("/api", canteenRouter)
 app.use('/orders', orderRouter)
-// app.use("/images",e)
 
 
 app.listen(process.env.PORT || 5000, () => {
