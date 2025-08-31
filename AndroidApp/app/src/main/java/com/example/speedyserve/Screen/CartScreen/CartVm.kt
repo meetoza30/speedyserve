@@ -67,7 +67,7 @@ class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
         }else{
             _canteenId.value = canteenId
             //calling to get time slots
-            getSlotDetails(onError)
+            getSlotDetails(onSuccess = {},onError)
 
             Log.d("getslot","canteenId $canteenId")
         }
@@ -111,7 +111,7 @@ class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
         }
     }
 
-    fun getSlotDetails(onError: (String) -> Unit){
+    fun getSlotDetails(onSuccess: () -> Unit,onError: (String) -> Unit){
         val slotDishes = cartDishes.value.map {
             dishslotReq(
                 dishId = it.dish._id,
@@ -128,6 +128,7 @@ class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
                 _slots.value=it.slots
                 _earliestPickupSlot.value = it.earilestPickupSlot
                 _selectedSlot.value = slots.value.get(0)
+                onSuccess()
                 Log.d("getslots",it.slots.toString())
             }
                 .onFailure {
@@ -162,15 +163,21 @@ class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
                 price = it.dish.price.toInt()
             )
         }
-        val timeslot = Json.encodeToString(selectedSlot.value)
+//        val timeslot = Json.encodeToString(selectedSlot.value)
+        val preptime = cartDishes.value.sumOf{
+            it.dish.serveTime.toInt() * it.quantity
+        }
+        val totalPrice = cartDishes.value.sumOf {
+            it.dish.price.toInt() * it.quantity
+        }
 
         val order = Order(
             userId = userId?:"",
             canteenId = _canteenId.value?:"",
             dishes = dishes,
-            timeSlot = timeslot,
-            totalPrice = 0,
-            preptime = 0
+            timeSlot = selectedSlot.value.startHHMM,
+            totalPrice = totalPrice,
+            preptime = preptime
 
         )
         Log.d("order",order.toString())
@@ -178,6 +185,9 @@ class CartVm @Inject constructor(private val repo: Repo) : ViewModel() {
             repo.placeOrder(order)
                 .onSuccess {
                     onSuccess(it.message)
+                    _cartDishes.value = emptyList()
+                    updateRepo()
+
                 }
                 .onFailure {
                     onError(it.message.toString())

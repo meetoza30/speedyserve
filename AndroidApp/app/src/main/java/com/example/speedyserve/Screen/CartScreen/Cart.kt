@@ -4,6 +4,7 @@ package com.speedyserve.ui.screens
 
 import android.icu.text.DateFormat
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -45,6 +46,7 @@ import com.example.speedyserve.Screen.CartScreen.CartVm
 import com.example.speedyserve.Screen.MenuScreen.dishWithQuantity
 import com.example.speedyserve.ui.theme.SpeedyServeTheme
 import com.example.speedyserve.utils.convertTimeFormat
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 
@@ -71,6 +73,8 @@ fun CartScreen(
     val timeSlots = viewModel.slots.collectAsState()
     var selectedTimeSlot = viewModel.selectedSlot.collectAsState()
     var updatedSelectedTimeSlot by remember { mutableStateOf(selectedTimeSlot.value) }
+    var refreshState  = remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope ()
@@ -85,6 +89,16 @@ fun CartScreen(
         }
 
     }
+
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            cartDishes.value
+        }.drop(2)
+            .collect { refreshState.value = true }
+    }
+//    LaunchedEffect(cartDishes.value) {
+//       refreshState.value=true
+//    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -168,6 +182,7 @@ fun CartScreen(
                     onQuantityChange = {}
                 )
             }
+
         }
 
 
@@ -213,10 +228,23 @@ fun CartScreen(
                         }
 
 
-                    TextButton(onClick = {showBottomSheet=true
+                    TextButton(onClick = {
+                        if(refreshState.value){
+                            coroutineScope.launch {
+                                viewModel.getSlotDetails (onSuccess = {
+                                    refreshState.value=false
+                                }){
+                                    Toast.makeText(context,it,Toast.LENGTH_SHORT).show()
+                                }
+
+                            }
+                        }else{
+                            showBottomSheet=true
+                        }
                    }) {
+
                         Text(
-                            text = "CHANGE",
+                            text = if(refreshState.value)"Refresh" else "CHANGE",
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.labelMedium.copy(
                                 fontWeight = FontWeight.Medium
@@ -474,8 +502,10 @@ fun CartScreen(
                 // Place Order Button
                 Button(
                     onClick = {viewModel.placeOrder(context, onError = {
+                        Log.d("checkplaceOrdeerror",it)
                         Toast.makeText(context,it, Toast.LENGTH_SHORT).show()
                     }, onSuccess = {
+                        Log.d("checkplaceOrdeerror",it)
                         Toast.makeText(context,it,Toast.LENGTH_SHORT).show()
                     })},
                     modifier = Modifier
@@ -484,6 +514,7 @@ fun CartScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
                     ),
+                    enabled = !refreshState.value,
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
