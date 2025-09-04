@@ -20,7 +20,7 @@ const getPendingOrders = async (req,res)=>{
  const updateOrderStatus = async(req,res)=>{
      try{const {canteenId} = req.params;
      const {orderId, status} = req.body;
-     const order = await Order.findOne({_id : orderId, canteenId, status: { $in: ["pending", "preparing"] }})
+     const order = await Order.findOne({_id : orderId})
      order.status = status;
      await order.save();
      res.status(200).json(order);
@@ -29,7 +29,6 @@ const getPendingOrders = async (req,res)=>{
      res.json(err)
  }
  }
-
  
  const placeOrder = async (req, res) => {
     try {
@@ -191,4 +190,32 @@ const getTodayOrderTimeline = async (req, res) => {
     }
 };
 
-export {addItemInOrder, getPendingOrders, updateOrderStatus, placeOrder, getCurrentOrders, getTodayOrderTimeline}
+
+const getAllTodayOrders = async (req, res) => {
+    try {
+        const { canteenId } = req.params;
+        
+        const today = new Date();
+        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+        const todayOrders = await Order.find({
+            canteenId: new mongoose.Types.ObjectId(canteenId),
+            createdAt: { $gte: startOfDay, $lt: endOfDay }
+        })
+        .populate({
+            path: 'dishes.dish',
+            select: 'name price image category'
+        })
+        .populate('userId', 'username emailId mobile')
+        .sort({ createdAt: -1 });
+
+        res.status(200).json({ success: true, data: todayOrders });
+    } catch (error) {
+        console.error("Today orders error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+
+export {addItemInOrder, getPendingOrders, updateOrderStatus, placeOrder, getCurrentOrders, getTodayOrderTimeline, getAllTodayOrders}

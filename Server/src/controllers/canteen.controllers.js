@@ -289,6 +289,84 @@ const loginCanteen = async (req, res)=>{
     }
 }
 
+const getCanteenProfile = async (req, res) => {
+    try {
+        const { canteenId } = req.params;
+        
+        if (!mongoose.Types.ObjectId.isValid(canteenId)) {
+            return res.status(400).json({ success: false, message: "Invalid canteen ID" });
+        }
+
+        const canteen = await Canteen.findById(canteenId).select('-password');
+        
+        if (!canteen) {
+            return res.status(404).json({ success: false, message: "Canteen not found" });
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            data: canteen 
+        });
+    } catch (error) {
+        console.error("Error fetching canteen profile:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+const updateCanteenProfile = async (req, res) => {
+    try {
+        const { canteenId } = req.params;
+        const { name, mobile, emailId, openingTime, closingTime, stoves } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(canteenId)) {
+            return res.status(400).json({ success: false, message: "Invalid canteen ID" });
+        }
+
+        // Check if email is being changed and if it already exists
+        if (emailId) {
+            const existingCanteen = await Canteen.findOne({ 
+                emailId, 
+                _id: { $ne: canteenId } 
+            });
+            if (existingCanteen) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Email already exists" 
+                });
+            }
+        }
+
+        const updatedData = {};
+        if (name) updatedData.name = name;
+        if (mobile) updatedData.mobile = mobile;
+        if (emailId) updatedData.emailId = emailId;
+        if (openingTime) updatedData.openingTime = openingTime;
+        if (closingTime) updatedData.closingTime = closingTime;
+        if (stoves) updatedData.stoves = stoves;
+
+        const updatedCanteen = await Canteen.findByIdAndUpdate(
+            canteenId,
+            updatedData,
+            { new: true, select: '-password' }
+        );
+
+        if (!updatedCanteen) {
+            return res.status(404).json({ success: false, message: "Canteen not found" });
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Profile updated successfully",
+            data: updatedCanteen 
+        });
+    } catch (error) {
+        console.error("Error updating canteen profile:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+
+
 const getCanteens = async (req, res) => {
     try {
         const canteens = await Canteen.find({});
@@ -523,6 +601,8 @@ const getDashboardOverview = async (req, res) => {
         const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
 
+        const canteenDetails = await Canteen.findById(canteenId).select("name")
+
         // Get today's stats
         const [todayOrders, todayRevenue, activeOrders, popularDish] = await Promise.all([
             // Today's total orders
@@ -530,6 +610,7 @@ const getDashboardOverview = async (req, res) => {
                 canteenId: new mongoose.Types.ObjectId(canteenId),
                 createdAt: { $gte: startOfDay, $lt: endOfDay }
             }),
+
 
             // Today's revenue
             Order.aggregate([
@@ -581,6 +662,7 @@ const getDashboardOverview = async (req, res) => {
         ]);
 
         const response = {
+            canteenDetails,
             todayOrders,
             todayRevenue: todayRevenue[0]?.total || 0,
             activeOrders,
@@ -629,4 +711,4 @@ const getWeeklyRevenue = async (req, res) => {
 };
 
 
-export {registerCanteen, loginCanteen, updateCanteen, getCanteens, getCanteensWithDishes, addDish, updateDish, removeDish, getSlots, getDashboardOverview, getWeeklyRevenue} ;
+export {registerCanteen, loginCanteen, updateCanteen, getCanteens, getCanteensWithDishes, addDish, updateDish, removeDish, getSlots, getDashboardOverview, getWeeklyRevenue, getCanteenProfile, updateCanteenProfile} ;
