@@ -8,13 +8,13 @@ import Orders from './pages/Orders/Orders'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Footer from './components/Footer/Footer'
-// import Login from './components/Login/Login'
 import { useState } from 'react'
 import SpeedyServeLanding from './pages/Landing/Landing'
 import Signup from './pages/Login/Signup'
 import Login from './pages/Login/Login'
 import CanteenDashboard from './pages/Dashboard/Dashboard'
 import ManageMenu from './pages/Add/Add'
+import CanteenProfile from './pages/Profile/Profile'
 
 const App = () => {
   const[showLogin,setShowLogin]=useState(false);
@@ -35,6 +35,7 @@ const App = () => {
           <Route path="/manage-menu" element={<ManageMenu />} />
           <Route path="/dashboard" element={<CanteenDashboard />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path='/profile' element = {<CanteenProfile />} />
         </Routes>
         
       </div>

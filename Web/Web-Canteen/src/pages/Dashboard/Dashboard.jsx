@@ -22,6 +22,7 @@ const CanteenDashboard = () => {
     });
     const [currentOrders, setCurrentOrders] = useState([]);
     const [weeklyRevenue, setWeeklyRevenue] = useState([]);
+    const [canteenName, setCanteenName] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -62,6 +63,8 @@ const CanteenDashboard = () => {
             const result = await response.json();
             if (result.success) {
                 setDashboardData(result.data);
+                setCanteenName(result.data.canteenDetails.name)
+
             }
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
@@ -132,12 +135,6 @@ const CanteenDashboard = () => {
         });
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('canteenId');
-        window.location.href = '/login';
-    };
-
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -190,7 +187,7 @@ const CanteenDashboard = () => {
                                 </div>
                                 <div className="ml-3">
                                     <h1 className="text-xl font-semibold text-gray-900">Dashboard</h1>
-                                    <p className="text-sm text-gray-500">SpeedyServe Canteen</p>
+                                    <p className="text-sm text-gray-500">{canteenName}</p>
                                 </div>
                             </div>
                         </div>
@@ -202,17 +199,13 @@ const CanteenDashboard = () => {
                             >
                                 {/* <RefreshIcon className="h-5 w-5 text-gray-600" /> */}Refresh
                             </button>
-                            <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                                <BellIcon className="h-5 w-5 text-gray-600" />
-                            </button>
                             <div className="relative">
-                                <button 
-                                    onClick={handleLogout}
-                                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                                >
-                                    <UserCircleIcon className="h-6 w-6 text-gray-600" />
-                                    <span className="text-sm text-gray-700 hidden md:block">Logout</span>
-                                </button>
+
+                                 <Link to="/profile"className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                                                            <UserCircleIcon className="h-4 w-4" /><
+                                                                span>Profile</span>
+                                                            </Link>
+                                
                             </div>
                         </div>
                     </div>
@@ -223,13 +216,9 @@ const CanteenDashboard = () => {
                 {/* Quick Actions */}
                 <div className="mb-6">
                     <div className="flex flex-wrap gap-3">
-                        <button className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors flex items-center space-x-2">
-                            <PlusIcon className="h-4 w-4" />
-                            <span>Add Dish</span>
-                        </button>
-                        <button className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        <Link to="/orders" className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                             View All Orders
-                        </button>
+                        </Link>
                         <Link to="/manage-menu">
                             <button className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                             Manage Menu
@@ -387,10 +376,6 @@ const CanteenDashboard = () => {
                                                                 Mark Ready
                                                             </button>
                                                         )}
-                                                        <button className="border border-gray-300 text-gray-700 px-3 py-1 rounded-lg text-sm hover:bg-gray-50 transition-colors flex items-center space-x-1">
-                                                            <EyeIcon className="h-3 w-3" />
-                                                            <span>Details</span>
-                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
