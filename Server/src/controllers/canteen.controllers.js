@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import { Slot } from "../models/slot.model.js";
 import {Order} from '../models/order.models.js'
 
-const CANTEEN_SAFE_DATA = "name mobile emailId openingTime closingTime";
+const CANTEEN_SAFE_DATA = "name image mobile emailId openingTime closingTime";
 
 //handles the availability of stoves
 class MinHeap {
