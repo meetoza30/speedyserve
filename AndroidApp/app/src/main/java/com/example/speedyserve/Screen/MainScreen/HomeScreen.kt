@@ -2,12 +2,14 @@
 
 package com.example.speedyserve.Screen.MainScreen
 
+import android.text.Layout
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -20,6 +22,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,12 +32,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.speedyserve.Models.Canteens.Canteen
 import com.example.speedyserve.Screen.MainScreen.HomeScreenVM
 import com.example.speedyserve.ui.theme.SpeedyServeTheme
@@ -72,12 +80,6 @@ fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
 
     }
 
-    val categories = listOf(
-        Category("All", Icons.Default.LocalFireDepartment, true),
-//        Category("Hot Dog", Icons.Default.Fastfood),
-//        Category("Burger", Icons.Default.LunchDining),
-//        Category("Pizza", Icons.Default.LocalPizza)
-    )
 
 
         Column(
@@ -163,7 +165,7 @@ fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
             Row {
                 Text(
-                    text =  "hey ,${user?.username ?: "Guest"} ",
+                    text =  "hey , ${user?.username ?: "Guest"} ",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(start = 16.dp)
@@ -175,10 +177,10 @@ fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
                     modifier = Modifier.padding(end = 16.dp)
                 )
             }
+            Spacer(modifier = Modifier.height(16.dp))
 
 
             // Search Bar
-            Spacer(modifier = Modifier.height(20.dp))
             OutlinedTextField(
                 value = "",
                 onValueChange = { },
@@ -205,44 +207,44 @@ fun HomeScreen(HomeScreenVM : HomeScreenVM,onCanteenClick : (String)-> Unit) {
             )
 
             // Categories Section
-            Spacer(modifier = Modifier.height(24.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "All Categories",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                TextButton(onClick = { }) {
-                    Text(
-                        text = "See All",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowRight,
-                        contentDescription = "See All",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
+//            Spacer(modifier = Modifier.height(24.dp))
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 16.dp),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Text(
+//                    text = "All Categories",
+//                    style = MaterialTheme.typography.titleLarge,
+//                    fontWeight = FontWeight.Bold
+//                )
+//                TextButton(onClick = { }) {
+//                    Text(
+//                        text = "See All",
+//                        color = MaterialTheme.colorScheme.primary
+//                    )
+//                    Icon(
+//                        imageVector = Icons.Default.KeyboardArrowRight,
+//                        contentDescription = "See All",
+//                        tint = MaterialTheme.colorScheme.primary,
+//                        modifier = Modifier.size(16.dp)
+//                    )
+//                }
+//            }
 
-            Spacer(modifier = Modifier.height(12.dp))
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(categories) { category ->
-                    CategoryChip(category = category){
-                        category.isSelected = true
-                    }
-                }
-            }
+//            Spacer(modifier = Modifier.height(12.dp))
+//            LazyRow(
+//                contentPadding = PaddingValues(horizontal = 16.dp),
+//                horizontalArrangement = Arrangement.spacedBy(12.dp)
+//            ) {
+//                items(categories) { category ->
+//                    CategoryChip(category = category){
+//                        category.isSelected = true
+//                    }
+//                }
+//            }
 
             // Open Restaurants Section
             Spacer(modifier = Modifier.height(32.dp))
@@ -342,21 +344,27 @@ fun RestaurantCard(restaurant: Canteen,
     ) {
         Column {
             // Restaurant Image
-            Box(
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(180.dp)
+//                    .background(MaterialTheme.colorScheme.surfaceVariant),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.Restaurant,
+//                    contentDescription = "Restaurant Image",
+//                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+//                    modifier = Modifier.size(48.dp)
+//                )
+//            }
+            AsyncImage(model = restaurant.image,
+                contentDescription = "CanteenImage",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Restaurant,
-                    contentDescription = "Restaurant Image",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
-
+                contentScale = ContentScale.Crop)
             // Restaurant Details
             Column(
                 modifier = Modifier.padding(16.dp)
@@ -407,3 +415,4 @@ fun RestaurantCard(restaurant: Canteen,
         }
     }
 }
+

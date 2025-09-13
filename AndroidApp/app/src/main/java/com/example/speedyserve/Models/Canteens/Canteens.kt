@@ -11,7 +11,8 @@ data class Canteen(
     val openingTime : String = "",
     val closingTime : String = "",
     val short_descripiton : String = "",
-    val rating : Double = 5.0
+    val rating : Double = 5.0,
+    val image : String = ""
     )
 
 data class CanteenResponse (

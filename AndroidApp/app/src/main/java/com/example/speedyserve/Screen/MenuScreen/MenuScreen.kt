@@ -3,6 +3,7 @@
 package com.speedyserve.ui.screens
 
 import android.graphics.Paint
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -35,12 +36,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.speedyserve.Screen.MenuScreen.MenuScreenVM
 import com.example.speedyserve.Screen.MenuScreen.dishWithQuantity
 
@@ -164,25 +167,30 @@ fun MenuScreen(
         ) {
             // Restaurant Header Image
             item {
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 20.dp)
                         .height(180.dp)
                         .clip(RoundedCornerShape(30.dp))
-                        .background(Color(0xFF2C3E50))
+//                        .background(Color(0xFF2C3E50)
+
                 ) {
+                    Log.d("Canteen",canteen.toString())
+                    Log.d("Canteenimage",canteen.image)
                     // Placeholder for restaurant image - in real app use AsyncImage
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Restaurant Image",
-                            color = Color.White,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                    AsyncImage(model = canteen.image,
+                        contentDescription = "canteenImage",
+                        contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+//                        .padding(horizontal = 20.dp, vertical = 20.dp)
+                        .height(180.dp)
+//                        .clip(RoundedCornerShape(30.dp))
+////                        .background(Color(0xFF2C3E50)
+//                        )
+                    )
                 }
             }
 
@@ -376,20 +384,29 @@ fun FoodItemCard(
             modifier = Modifier.padding(12.dp)
         ) {
             // Food Image
-            Box(
+            AsyncImage(model = item.dish.image,
+                contentDescription = "dish image",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color(0xFFF5F5F5)),
-                contentAlignment = Alignment.Center
-            ) {
-                // Placeholder for food image - in real app use AsyncImage
-                Text(
-                    text = "🍔",
-                    fontSize = 32.sp
+                contentScale = ContentScale.Crop
                 )
-            }
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(80.dp)
+//                    .clip(RoundedCornerShape(8.dp))
+//                    .background(Color(0xFFF5F5F5)),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                // Placeholder for food image - in real app use AsyncImage
+//                Text(
+//                    text = "🍔",
+//                    fontSize = 32.sp
+//                )
+//            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
