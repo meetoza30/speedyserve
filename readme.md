@@ -51,7 +51,7 @@ The platform is available on both **Web**(for canteen) and **Mobile (Android)**(
 ### 📱 Mobile App
 | SignIn Screen | SignUp Screen | Home Screen |
 |-------------|-----------------|---------|
-|  <img src="resources/signin.jpg" width="200"/> | <img src="resources/signup.jpg" width="200"/> | <img src="resources/homescreen.jpg" width="200"/> |
+|  <img src="resources/cartscreen.png" width="200"/> | <img src="resources/signup.jpg" width="200"/> | <img src="resources/homescreen.jpg" width="200"/> |
 
 
 | Menu Screen | Menu Screen | Cart Screen |
@@ -70,4 +70,5 @@ The platform is available on both **Web**(for canteen) and **Mobile (Android)**(
 
 
 ---
+
 
