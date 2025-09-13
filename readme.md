@@ -51,17 +51,17 @@ The platform is available on both **Web**(for canteen) and **Mobile (Android)**(
 ### 📱 Mobile App
 | SignIn Screen | SignUp Screen | Home Screen |
 |-------------|-----------------|---------|
-|  <img src="resources/cartscreen.png" width="200"/> | <img src="resources/signup.jpg" width="200"/> | <img src="resources/homescreen.jpg" width="200"/> |
+|  <img src="resources/signing.png" width="200"/> | <img src="resources/signup.png" width="200"/> | <img src="resources/homescreen.png" width="200"/> |
 
 
 | Menu Screen | Menu Screen | Cart Screen |
 |-------------|-----------------|---------|
-|  <img src="resources/menuscreen.jpg" width="200"/> | <img src="resources/menuscreen2.jpg" width="200"/> | <img src="resources/cartscreen.jpg" width="200"/> |
+|  <img src="resources/menuscreen.png" width="200"/> | <img src="resources/menuscreen2.png" width="200"/> | <img src="resources/cartscreen.png" width="200"/> |
 
 
 | Timeslot Screen | Timeslot Screen | 
 |-------------|-----------------|
-|  <img src="resources/timeslot.jpg" width="200"/> | <img src="resources/timeslot2.jpg" width="200"/> | 
+|  <img src="resources/timeslot.png" width="200"/> | <img src="resources/timeslot2.png" width="200"/> | 
 
 ### 💻 Web App
 | Dashboard | Service Page | Admin Panel |
@@ -70,5 +70,6 @@ The platform is available on both **Web**(for canteen) and **Mobile (Android)**(
 
 
 ---
+
 
 
