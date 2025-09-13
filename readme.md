@@ -17,7 +17,7 @@ The platform is available on both **Web**(for canteen) and **Mobile (Android)**(
 
 ---
 
-## ✨ Featuresp  
+## ✨ Features
 - 🍔 **Pre-order food** – proorder food and avoid long queues  
 - ⏰ **Time-slot booking system** – avoid rush by scheduling pickup times  
 - 🔔 **Order notifications** – get real-time updates on order status    
@@ -49,9 +49,19 @@ The platform is available on both **Web**(for canteen) and **Mobile (Android)**(
 ## 📷 Screenshots
 
 ### 📱 Mobile App
-| Home Screen | Service Booking | Profile |
+| SignIn Screen | SignUp Screen | Home Screen |
 |-------------|-----------------|---------|
-| ![App Home](assets/screenshots/app_home.png) | ![Booking](assets/screenshots/app_booking.png) | ![Profile](assets/screenshots/app_profile.png) |
+|  <img src="resources/signin.jpg" width="200"/> | <img src="resources/signup.jpg" width="200"/> | <img src="resources/homescreen.jpg" width="200"/> |
+
+
+| Menu Screen | Menu Screen | Cart Screen |
+|-------------|-----------------|---------|
+|  <img src="resources/menuscreen.jpg" width="200"/> | <img src="resources/menuscreen2.jpg" width="200"/> | <img src="resources/cartscreen.jpg" width="200"/> |
+
+
+| Timeslot Screen | Timeslot Screen | 
+|-------------|-----------------|
+|  <img src="resources/timeslot.jpg" width="200"/> | <img src="resources/timeslot2.jpg" width="200"/> | 
 
 ### 💻 Web App
 | Dashboard | Service Page | Admin Panel |
@@ -60,3 +70,4 @@ The platform is available on both **Web**(for canteen) and **Mobile (Android)**(
 
 
 ---
+
