@@ -51,25 +51,22 @@ The platform is available on both **Web**(for canteen) and **Mobile (Android)**(
 ### 📱 Mobile App
 | SignIn Screen | SignUp Screen | Home Screen |
 |-------------|-----------------|---------|
-|  <img src="resources/signing.png" width="200"/> | <img src="resources/signup.png" width="200"/> | <img src="resources/homescreen.png" width="200"/> |
+|  <img src="resources/signin.png" width="300"/> | <img src="resources/signup.png" width="300"/> | <img src="resources/homescreen.png" width="300"/> |
 
 
 | Menu Screen | Menu Screen | Cart Screen |
 |-------------|-----------------|---------|
-|  <img src="resources/menuscreen.png" width="200"/> | <img src="resources/menuscreen2.png" width="200"/> | <img src="resources/cartscreen.png" width="200"/> |
+|  <img src="resources/menuscreen.png" width="300"/> | <img src="resources/menuscreen2.png" width="300"/> | <img src="resources/cartscreen.png" width="300"/> |
 
 
 | Timeslot Screen | Timeslot Screen | 
 |-------------|-----------------|
-|  <img src="resources/timeslot.png" width="200"/> | <img src="resources/timeslot2.png" width="200"/> | 
+|  <img src="resources/timeslot.png" width="300"/> | <img src="resources/timeslot2.png" width="300"/> | 
 
 ### 💻 Web App
-| Dashboard | Service Page | Admin Panel |
-|-----------|--------------|-------------|
-| ![Web Dashboard](assets/screenshots/web_dashboard.png) | ![Service Page](assets/screenshots/web_service.png) | ![Admin Panel](assets/screenshots/web_admin.png) |
-
 
 ---
+
 
 
 
