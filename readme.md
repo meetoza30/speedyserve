@@ -10,10 +10,6 @@ The platform is available on both **Web**(for canteen) and **Mobile (Android)**(
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Screenshots](#-screenshots)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Contributors](#-contributors)
-- [License](#-license)
 
 ---
 
@@ -66,6 +62,7 @@ The platform is available on both **Web**(for canteen) and **Mobile (Android)**(
 ### 💻 Web App
 
 ---
+
 
 
 
